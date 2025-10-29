@@ -6,518 +6,847 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
   xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" 
   xmlns:modeler="http://camunda.org/schema/modeler/1.0" 
-  id="Definitions_PetHotel" 
+  id="Definitions_PetHotel_v2" 
   targetNamespace="http://bpmn.io/schema/bpmn" 
   exporter="Camunda Modeler" 
   exporterVersion="5.36.1" 
   modeler:executionPlatform="Camunda Cloud" 
   modeler:executionPlatformVersion="8.5.0">
   
+  <!-- COLLABORATION -->
   <bpmn:collaboration id="Collaboration_PetHotel">
-    <bpmn:participant id="Participant_PetHotel" name="Отель для домашних животных" processRef="PetHotelProcess_v2" />
+    <bpmn:participant id="Participant_PetHotel" name="🏨 Отель для домашних животных" processRef="PetHotelProcess_v2" />
   </bpmn:collaboration>
   
-  <bpmn:process id="PetHotelProcess_v2" name="Процесс работы отеля для питомцев (Полный)" isExecutable="true">
+  <!-- PROCESS -->
+  <bpmn:process id="PetHotelProcess_v2" name="Процесс работы отеля для питомцев" isExecutable="true">
     
-    <!-- ========== START EVENT ========== -->
-    <bpmn:startEvent id="StartEvent_BookingRequest" name="Получен запрос на бронь">
-      <bpmn:outgoing>Flow_To_RegisterBooking</bpmn:outgoing>
+    <!-- ========== LANE SET ========== -->
+    <bpmn:laneSet id="LaneSet_1">
+      
+      <!-- LANE 1: Reception -->
+      <bpmn:lane id="Lane_Reception" name="📋 Специалист по приему">
+        <bpmn:flowNodeRef>Event_Start</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_RegisterBooking</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_CheckVaccination</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_VaccinationCheck</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_Rejected</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_GenerateContract</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_CheckIn</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_CheckInSplit</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Checkout</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Feedback</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_FinalSplit</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_PetLeft</bpmn:flowNodeRef>
+      </bpmn:lane>
+      
+      <!-- LANE 2: Veterinarian -->
+      <bpmn:lane id="Lane_Veterinarian" name="🩺 Ветеринарный специалист">
+        <bpmn:flowNodeRef>Task_VetCheck</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_CheckInJoin</bpmn:flowNodeRef>
+      </bpmn:lane>
+      
+      <!-- LANE 3: Care Specialist -->
+      <bpmn:lane id="Lane_CareSpecialist" name="🐾 Специалист по уходу">
+        <bpmn:flowNodeRef>Task_AssignRoom</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_DailyFeeding</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_DailyWalk</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_HealthCheck</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_MedicationCheck</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Medication</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_MedicationJoin</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_CompatibilityCheck</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_PlayDecision</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_GroupPlay</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_IndividualPlay</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_PlayJoin</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_OwnerUpdate</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_PrepareForDeparture</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_FinalReport</bpmn:flowNodeRef>
+      </bpmn:lane>
+      
+      <!-- LANE 4: Housekeeping -->
+      <bpmn:lane id="Lane_Housekeeping" name="🧹 Хозяйственный отдел">
+        <bpmn:flowNodeRef>Task_CleanRoom</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_RoomReady</bpmn:flowNodeRef>
+      </bpmn:lane>
+      
+    </bpmn:laneSet>
+    
+    <!-- ========== ELEMENTS ========== -->
+    
+    <!-- START -->
+    <bpmn:startEvent id="Event_Start" name="Получен запрос на бронь">
+      <bpmn:outgoing>Flow_01</bpmn:outgoing>
     </bpmn:startEvent>
     
-    <bpmn:sequenceFlow id="Flow_To_RegisterBooking" sourceRef="StartEvent_BookingRequest" targetRef="Task_RegisterBooking" />
+    <bpmn:sequenceFlow id="Flow_01" sourceRef="Event_Start" targetRef="Task_RegisterBooking" />
     
-    <!-- ========== TASK: REGISTER BOOKING ========== -->
+    <!-- TASK 1 -->
     <bpmn:userTask id="Task_RegisterBooking" name="Зарегистрировать бронь">
       <bpmn:extensionElements>
         <zeebe:formDefinition formId="BookingForm" />
         <zeebe:assignmentDefinition candidateGroups="specialist-priem" />
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_To_RegisterBooking</bpmn:incoming>
-      <bpmn:outgoing>Flow_To_VaccinationCheck</bpmn:outgoing>
+      <bpmn:incoming>Flow_01</bpmn:incoming>
+      <bpmn:outgoing>Flow_02</bpmn:outgoing>
     </bpmn:userTask>
     
-    <bpmn:sequenceFlow id="Flow_To_VaccinationCheck" sourceRef="Task_RegisterBooking" targetRef="Task_CheckVaccination" />
+    <bpmn:sequenceFlow id="Flow_02" sourceRef="Task_RegisterBooking" targetRef="Task_CheckVaccination" />
     
-    <!-- ========== DMN: VACCINATION CHECK ========== -->
+    <!-- DMN 1 -->
     <bpmn:businessRuleTask id="Task_CheckVaccination" name="Проверить вакцинацию">
       <bpmn:extensionElements>
         <zeebe:calledDecision decisionId="vaccination_check" resultVariable="vaccinationResult" />
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_To_VaccinationCheck</bpmn:incoming>
-      <bpmn:outgoing>Flow_To_VaccinationGateway</bpmn:outgoing>
+      <bpmn:incoming>Flow_02</bpmn:incoming>
+      <bpmn:outgoing>Flow_03</bpmn:outgoing>
     </bpmn:businessRuleTask>
     
-    <bpmn:sequenceFlow id="Flow_To_VaccinationGateway" sourceRef="Task_CheckVaccination" targetRef="Gateway_VaccinationDecision" />
+    <bpmn:sequenceFlow id="Flow_03" sourceRef="Task_CheckVaccination" targetRef="Gateway_VaccinationCheck" />
     
-    <!-- ========== GATEWAY: VACCINATION DECISION ========== -->
-    <bpmn:exclusiveGateway id="Gateway_VaccinationDecision" name="Вакцинация актуальна?">
-      <bpmn:incoming>Flow_To_VaccinationGateway</bpmn:incoming>
-      <bpmn:outgoing>Flow_VaccinationApproved</bpmn:outgoing>
-      <bpmn:outgoing>Flow_VaccinationRejected</bpmn:outgoing>
+    <!-- GATEWAY 1 -->
+    <bpmn:exclusiveGateway id="Gateway_VaccinationCheck" name="Вакцинация актуальна?">
+      <bpmn:incoming>Flow_03</bpmn:incoming>
+      <bpmn:outgoing>Flow_Approved</bpmn:outgoing>
+      <bpmn:outgoing>Flow_Rejected</bpmn:outgoing>
     </bpmn:exclusiveGateway>
     
-    <bpmn:sequenceFlow id="Flow_VaccinationApproved" name="Одобрено" sourceRef="Gateway_VaccinationDecision" targetRef="Task_GenerateContract">
+    <bpmn:sequenceFlow id="Flow_Approved" name="Да" sourceRef="Gateway_VaccinationCheck" targetRef="Task_GenerateContract">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=vaccinationResult.bookingDecision != "Отклонено"</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     
-    <bpmn:sequenceFlow id="Flow_VaccinationRejected" name="Отклонено" sourceRef="Gateway_VaccinationDecision" targetRef="EndEvent_BookingRejected">
+    <bpmn:sequenceFlow id="Flow_Rejected" name="Нет" sourceRef="Gateway_VaccinationCheck" targetRef="Event_Rejected">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=vaccinationResult.bookingDecision = "Отклонено"</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     
-    <!-- ========== END: BOOKING REJECTED ========== -->
-    <bpmn:endEvent id="EndEvent_BookingRejected" name="Бронь отклонена">
-      <bpmn:incoming>Flow_VaccinationRejected</bpmn:incoming>
+    <!-- END REJECTED -->
+    <bpmn:endEvent id="Event_Rejected" name="Бронь отклонена">
+      <bpmn:incoming>Flow_Rejected</bpmn:incoming>
     </bpmn:endEvent>
     
-    <!-- ========== SERVICE TASK: GENERATE CONTRACT ========== -->
+    <!-- SERVICE TASK -->
     <bpmn:serviceTask id="Task_GenerateContract" name="Сгенерировать договор">
       <bpmn:extensionElements>
         <zeebe:taskDefinition type="generate-contract" />
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_VaccinationApproved</bpmn:incoming>
-      <bpmn:outgoing>Flow_To_CheckIn</bpmn:outgoing>
+      <bpmn:incoming>Flow_Approved</bpmn:incoming>
+      <bpmn:outgoing>Flow_04</bpmn:outgoing>
     </bpmn:serviceTask>
     
-    <bpmn:sequenceFlow id="Flow_To_CheckIn" sourceRef="Task_GenerateContract" targetRef="Task_CheckIn" />
+    <bpmn:sequenceFlow id="Flow_04" sourceRef="Task_GenerateContract" targetRef="Task_CheckIn" />
     
-    <!-- ========== TASK: CHECK IN ========== -->
-    <bpmn:userTask id="Task_CheckIn" name="Провести регистрацию заезда">
+    <!-- TASK 2 -->
+    <bpmn:userTask id="Task_CheckIn" name="Регистрация заезда">
       <bpmn:extensionElements>
         <zeebe:formDefinition formId="CheckInForm" />
         <zeebe:assignmentDefinition candidateGroups="specialist-priem" />
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_To_CheckIn</bpmn:incoming>
-      <bpmn:outgoing>Flow_To_ParallelGateway</bpmn:outgoing>
+      <bpmn:incoming>Flow_04</bpmn:incoming>
+      <bpmn:outgoing>Flow_05</bpmn:outgoing>
     </bpmn:userTask>
     
-    <bpmn:sequenceFlow id="Flow_To_ParallelGateway" sourceRef="Task_CheckIn" targetRef="Gateway_CheckInSplit" />
+    <bpmn:sequenceFlow id="Flow_05" sourceRef="Task_CheckIn" targetRef="Gateway_CheckInSplit" />
     
-    <!-- ========== PARALLEL GATEWAY: SPLIT ========== -->
+    <!-- GATEWAY SPLIT -->
     <bpmn:parallelGateway id="Gateway_CheckInSplit">
-      <bpmn:incoming>Flow_To_ParallelGateway</bpmn:incoming>
-      <bpmn:outgoing>Flow_To_VetCheck</bpmn:outgoing>
-      <bpmn:outgoing>Flow_To_AssignRoom</bpmn:outgoing>
+      <bpmn:incoming>Flow_05</bpmn:incoming>
+      <bpmn:outgoing>Flow_06a</bpmn:outgoing>
+      <bpmn:outgoing>Flow_06b</bpmn:outgoing>
     </bpmn:parallelGateway>
     
-    <bpmn:sequenceFlow id="Flow_To_VetCheck" sourceRef="Gateway_CheckInSplit" targetRef="Task_VetCheck" />
-    <bpmn:sequenceFlow id="Flow_To_AssignRoom" sourceRef="Gateway_CheckInSplit" targetRef="Task_AssignRoom" />
+    <bpmn:sequenceFlow id="Flow_06a" sourceRef="Gateway_CheckInSplit" targetRef="Task_VetCheck" />
+    <bpmn:sequenceFlow id="Flow_06b" sourceRef="Gateway_CheckInSplit" targetRef="Task_AssignRoom" />
     
-    <!-- ========== TASK: VET CHECK ========== -->
-    <bpmn:userTask id="Task_VetCheck" name="Провести вет. осмотр">
+    <!-- TASK 3: VET CHECK -->
+    <bpmn:userTask id="Task_VetCheck" name="Вет. осмотр">
       <bpmn:extensionElements>
         <zeebe:formDefinition formId="VetCheckForm" />
         <zeebe:assignmentDefinition candidateGroups="veterinar" />
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_To_VetCheck</bpmn:incoming>
-      <bpmn:outgoing>Flow_From_VetCheck</bpmn:outgoing>
+      <bpmn:incoming>Flow_06a</bpmn:incoming>
+      <bpmn:outgoing>Flow_07a</bpmn:outgoing>
     </bpmn:userTask>
     
-    <bpmn:sequenceFlow id="Flow_From_VetCheck" sourceRef="Task_VetCheck" targetRef="Gateway_CheckInJoin" />
+    <bpmn:sequenceFlow id="Flow_07a" sourceRef="Task_VetCheck" targetRef="Gateway_CheckInJoin" />
     
-    <!-- ========== TASK: ASSIGN ROOM ========== -->
-    <bpmn:userTask id="Task_AssignRoom" name="Разместить питомца в номере">
+    <!-- TASK 4: ASSIGN ROOM -->
+    <bpmn:userTask id="Task_AssignRoom" name="Разместить в номере">
       <bpmn:extensionElements>
         <zeebe:formDefinition formId="RoomAssignmentForm" />
         <zeebe:assignmentDefinition candidateGroups="care-specialist" />
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_To_AssignRoom</bpmn:incoming>
-      <bpmn:outgoing>Flow_From_AssignRoom</bpmn:outgoing>
+      <bpmn:incoming>Flow_06b</bpmn:incoming>
+      <bpmn:outgoing>Flow_07b</bpmn:outgoing>
     </bpmn:userTask>
     
-    <bpmn:sequenceFlow id="Flow_From_AssignRoom" sourceRef="Task_AssignRoom" targetRef="Gateway_CheckInJoin" />
+    <bpmn:sequenceFlow id="Flow_07b" sourceRef="Task_AssignRoom" targetRef="Gateway_CheckInJoin" />
     
-    <!-- ========== PARALLEL GATEWAY: JOIN ========== -->
+    <!-- GATEWAY JOIN -->
     <bpmn:parallelGateway id="Gateway_CheckInJoin">
-      <bpmn:incoming>Flow_From_VetCheck</bpmn:incoming>
-      <bpmn:incoming>Flow_From_AssignRoom</bpmn:incoming>
-      <bpmn:outgoing>Flow_To_DailyCare</bpmn:outgoing>
+      <bpmn:incoming>Flow_07a</bpmn:incoming>
+      <bpmn:incoming>Flow_07b</bpmn:incoming>
+      <bpmn:outgoing>Flow_08</bpmn:outgoing>
     </bpmn:parallelGateway>
     
-    <bpmn:sequenceFlow id="Flow_To_DailyCare" sourceRef="Gateway_CheckInJoin" targetRef="SubProcess_DailyCare" />
+    <bpmn:sequenceFlow id="Flow_08" sourceRef="Gateway_CheckInJoin" targetRef="Task_DailyFeeding" />
     
-    <!-- ========== SUBPROCESS: DAILY CARE ========== -->
-    <bpmn:subProcess id="SubProcess_DailyCare" name="Ежедневный уход">
-      <bpmn:incoming>Flow_To_DailyCare</bpmn:incoming>
-      <bpmn:outgoing>Flow_To_PrepareForDeparture</bpmn:outgoing>
-      
-      <!-- START -->
-      <bpmn:startEvent id="Start_DailyCare">
-        <bpmn:outgoing>Flow_Daily_To_Feeding</bpmn:outgoing>
-      </bpmn:startEvent>
-      
-      <bpmn:sequenceFlow id="Flow_Daily_To_Feeding" sourceRef="Start_DailyCare" targetRef="Task_DailyFeeding" />
-      
-      <!-- FEEDING -->
-      <bpmn:userTask id="Task_DailyFeeding" name="Кормление">
-        <bpmn:extensionElements>
-          <zeebe:formDefinition formId="FeedingForm" />
-          <zeebe:assignmentDefinition candidateGroups="care-specialist" />
-        </bpmn:extensionElements>
-        <bpmn:incoming>Flow_Daily_To_Feeding</bpmn:incoming>
-        <bpmn:outgoing>Flow_Daily_To_Walk</bpmn:outgoing>
-      </bpmn:userTask>
-      
-      <bpmn:sequenceFlow id="Flow_Daily_To_Walk" sourceRef="Task_DailyFeeding" targetRef="Task_DailyWalk" />
-      
-      <!-- WALK -->
-      <bpmn:userTask id="Task_DailyWalk" name="Прогулка">
-        <bpmn:extensionElements>
-          <zeebe:formDefinition formId="WalkForm" />
-          <zeebe:assignmentDefinition candidateGroups="care-specialist" />
-        </bpmn:extensionElements>
-        <bpmn:incoming>Flow_Daily_To_Walk</bpmn:incoming>
-        <bpmn:outgoing>Flow_Daily_To_HealthCheck</bpmn:outgoing>
-      </bpmn:userTask>
-      
-      <bpmn:sequenceFlow id="Flow_Daily_To_HealthCheck" sourceRef="Task_DailyWalk" targetRef="Task_HealthMonitoring" />
-      
-      <!-- HEALTH MONITORING -->
-      <bpmn:userTask id="Task_HealthMonitoring" name="Мониторинг здоровья">
-        <bpmn:extensionElements>
-          <zeebe:formDefinition formId="HealthCheckForm" />
-          <zeebe:assignmentDefinition candidateGroups="care-specialist" />
-        </bpmn:extensionElements>
-        <bpmn:incoming>Flow_Daily_To_HealthCheck</bpmn:incoming>
-        <bpmn:outgoing>Flow_Daily_To_MedicationGateway</bpmn:outgoing>
-      </bpmn:userTask>
-      
-      <bpmn:sequenceFlow id="Flow_Daily_To_MedicationGateway" sourceRef="Task_HealthMonitoring" targetRef="Gateway_MedicationNeeded" />
-      
-      <!-- MEDICATION GATEWAY -->
-      <bpmn:exclusiveGateway id="Gateway_MedicationNeeded" name="Требуются лекарства?">
-        <bpmn:incoming>Flow_Daily_To_MedicationGateway</bpmn:incoming>
-        <bpmn:outgoing>Flow_Daily_ToMedication</bpmn:outgoing>
-        <bpmn:outgoing>Flow_Daily_SkipMedication</bpmn:outgoing>
-      </bpmn:exclusiveGateway>
-      
-      <bpmn:sequenceFlow id="Flow_Daily_ToMedication" name="Да" sourceRef="Gateway_MedicationNeeded" targetRef="Task_Medication">
-        <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=requiresMedication = true</bpmn:conditionExpression>
-      </bpmn:sequenceFlow>
-      
-      <bpmn:sequenceFlow id="Flow_Daily_SkipMedication" name="Нет" sourceRef="Gateway_MedicationNeeded" targetRef="Gateway_MedicationJoin">
-        <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=requiresMedication = false</bpmn:conditionExpression>
-      </bpmn:sequenceFlow>
-      
-      <!-- MEDICATION TASK -->
-      <bpmn:userTask id="Task_Medication" name="Дать лекарства">
-        <bpmn:extensionElements>
-          <zeebe:formDefinition formId="MedicationForm" />
-          <zeebe:assignmentDefinition candidateGroups="care-specialist" />
-        </bpmn:extensionElements>
-        <bpmn:incoming>Flow_Daily_ToMedication</bpmn:incoming>
-        <bpmn:outgoing>Flow_Daily_FromMedication</bpmn:outgoing>
-      </bpmn:userTask>
-      
-      <bpmn:sequenceFlow id="Flow_Daily_FromMedication" sourceRef="Task_Medication" targetRef="Gateway_MedicationJoin" />
-      
-      <!-- MEDICATION JOIN -->
-      <bpmn:exclusiveGateway id="Gateway_MedicationJoin">
-        <bpmn:incoming>Flow_Daily_SkipMedication</bpmn:incoming>
-        <bpmn:incoming>Flow_Daily_FromMedication</bpmn:incoming>
-        <bpmn:outgoing>Flow_Daily_To_CompatibilityCheck</bpmn:outgoing>
-      </bpmn:exclusiveGateway>
-      
-      <bpmn:sequenceFlow id="Flow_Daily_To_CompatibilityCheck" sourceRef="Gateway_MedicationJoin" targetRef="Task_CompatibilityCheck" />
-      
-      <!-- DMN: COMPATIBILITY CHECK -->
-      <bpmn:businessRuleTask id="Task_CompatibilityCheck" name="Оценить совместимость">
-        <bpmn:extensionElements>
-          <zeebe:calledDecision decisionId="pet_compatibility_check" resultVariable="compatibilityResult" />
-        </bpmn:extensionElements>
-        <bpmn:incoming>Flow_Daily_To_CompatibilityCheck</bpmn:incoming>
-        <bpmn:outgoing>Flow_Daily_To_PlayDecision</bpmn:outgoing>
-      </bpmn:businessRuleTask>
-      
-      <bpmn:sequenceFlow id="Flow_Daily_To_PlayDecision" sourceRef="Task_CompatibilityCheck" targetRef="Gateway_PlayDecision" />
-      
-      <!-- PLAY DECISION GATEWAY -->
-      <bpmn:exclusiveGateway id="Gateway_PlayDecision" name="Совместим?">
-        <bpmn:incoming>Flow_Daily_To_PlayDecision</bpmn:incoming>
-        <bpmn:outgoing>Flow_Daily_To_GroupPlay</bpmn:outgoing>
-        <bpmn:outgoing>Flow_Daily_To_IndividualPlay</bpmn:outgoing>
-      </bpmn:exclusiveGateway>
-      
-      <bpmn:sequenceFlow id="Flow_Daily_To_GroupPlay" name="Да" sourceRef="Gateway_PlayDecision" targetRef="Task_GroupPlay">
-        <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=compatibilityResult.уровеньСовместимости != "Несовместим"</bpmn:conditionExpression>
-      </bpmn:sequenceFlow>
-      
-      <bpmn:sequenceFlow id="Flow_Daily_To_IndividualPlay" name="Нет" sourceRef="Gateway_PlayDecision" targetRef="Task_IndividualPlay">
-        <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=compatibilityResult.уровеньСовместимости = "Несовместим"</bpmn:conditionExpression>
-      </bpmn:sequenceFlow>
-      
-      <!-- GROUP PLAY -->
-      <bpmn:userTask id="Task_GroupPlay" name="Организовать групповые игры">
-        <bpmn:extensionElements>
-          <zeebe:formDefinition formId="DailyActivityForm" />
-          <zeebe:assignmentDefinition candidateGroups="care-specialist" />
-        </bpmn:extensionElements>
-        <bpmn:incoming>Flow_Daily_To_GroupPlay</bpmn:incoming>
-        <bpmn:outgoing>Flow_Daily_From_GroupPlay</bpmn:outgoing>
-      </bpmn:userTask>
-      
-      <bpmn:sequenceFlow id="Flow_Daily_From_GroupPlay" sourceRef="Task_GroupPlay" targetRef="Gateway_PlayJoin" />
-      
-      <!-- INDIVIDUAL PLAY -->
-      <bpmn:userTask id="Task_IndividualPlay" name="Организовать индивидуальные игры">
-        <bpmn:extensionElements>
-          <zeebe:formDefinition formId="DailyActivityForm" />
-          <zeebe:assignmentDefinition candidateGroups="care-specialist" />
-        </bpmn:extensionElements>
-        <bpmn:incoming>Flow_Daily_To_IndividualPlay</bpmn:incoming>
-        <bpmn:outgoing>Flow_Daily_From_IndividualPlay</bpmn:outgoing>
-      </bpmn:userTask>
-      
-      <bpmn:sequenceFlow id="Flow_Daily_From_IndividualPlay" sourceRef="Task_IndividualPlay" targetRef="Gateway_PlayJoin" />
-      
-      <!-- PLAY JOIN -->
-      <bpmn:exclusiveGateway id="Gateway_PlayJoin">
-        <bpmn:incoming>Flow_Daily_From_GroupPlay</bpmn:incoming>
-        <bpmn:incoming>Flow_Daily_From_IndividualPlay</bpmn:incoming>
-        <bpmn:outgoing>Flow_Daily_To_OwnerUpdate</bpmn:outgoing>
-      </bpmn:exclusiveGateway>
-      
-      <bpmn:sequenceFlow id="Flow_Daily_To_OwnerUpdate" sourceRef="Gateway_PlayJoin" targetRef="Task_SendOwnerUpdate" />
-      
-      <!-- OWNER UPDATE -->
-      <bpmn:userTask id="Task_SendOwnerUpdate" name="Отправить отчет владельцу">
-        <bpmn:extensionElements>
-          <zeebe:formDefinition formId="OwnerUpdateForm" />
-          <zeebe:assignmentDefinition candidateGroups="care-specialist" />
-        </bpmn:extensionElements>
-        <bpmn:incoming>Flow_Daily_To_OwnerUpdate</bpmn:incoming>
-        <bpmn:outgoing>Flow_Daily_To_Timer</bpmn:outgoing>
-      </bpmn:userTask>
-      
-      <bpmn:sequenceFlow id="Flow_Daily_To_Timer" sourceRef="Task_SendOwnerUpdate" targetRef="Event_DailyTimer" />
-      
-      <!-- TIMER: DAILY REPEAT -->
-      <bpmn:intermediateCatchEvent id="Event_DailyTimer" name="Ждать следующий день">
-        <bpmn:incoming>Flow_Daily_To_Timer</bpmn:incoming>
-        <bpmn:outgoing>Flow_Daily_To_ContinueGateway</bpmn:outgoing>
-        <bpmn:timerEventDefinition id="TimerEventDefinition_Daily">
-          <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT24H</bpmn:timeDuration>
-        </bpmn:timerEventDefinition>
-      </bpmn:intermediateCatchEvent>
-      
-      <bpmn:sequenceFlow id="Flow_Daily_To_ContinueGateway" sourceRef="Event_DailyTimer" targetRef="Gateway_ContinueOrEnd" />
-      
-      <!-- GATEWAY: CONTINUE OR END -->
-      <bpmn:exclusiveGateway id="Gateway_ContinueOrEnd" name="Продолжить уход?">
-        <bpmn:incoming>Flow_Daily_To_ContinueGateway</bpmn:incoming>
-        <bpmn:outgoing>Flow_Daily_Continue</bpmn:outgoing>
-        <bpmn:outgoing>Flow_Daily_ToEnd</bpmn:outgoing>
-      </bpmn:exclusiveGateway>
-      
-      <bpmn:sequenceFlow id="Flow_Daily_Continue" name="Да" sourceRef="Gateway_ContinueOrEnd" targetRef="Task_DailyFeeding">
-        <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=today() &lt; date(checkOutDate)</bpmn:conditionExpression>
-      </bpmn:sequenceFlow>
-      
-      <bpmn:sequenceFlow id="Flow_Daily_ToEnd" name="Нет" sourceRef="Gateway_ContinueOrEnd" targetRef="End_DailyCare">
-        <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=today() >= date(checkOutDate)</bpmn:conditionExpression>
-      </bpmn:sequenceFlow>
-      
-      <!-- END DAILY CARE -->
-      <bpmn:endEvent id="End_DailyCare">
-        <bpmn:incoming>Flow_Daily_ToEnd</bpmn:incoming>
-      </bpmn:endEvent>
-      
-    </bpmn:subProcess>
+    <!-- TASK 5: FEEDING -->
+    <bpmn:userTask id="Task_DailyFeeding" name="Кормление">
+      <bpmn:extensionElements>
+        <zeebe:formDefinition formId="FeedingForm" />
+        <zeebe:assignmentDefinition candidateGroups="care-specialist" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_08</bpmn:incoming>
+      <bpmn:outgoing>Flow_09</bpmn:outgoing>
+    </bpmn:userTask>
     
-    <!-- ========== BOUNDARY EVENT: EMERGENCY ========== -->
-    <bpmn:boundaryEvent id="Event_Emergency" name="Экстренная ситуация" attachedToRef="SubProcess_DailyCare">
-      <bpmn:outgoing>Flow_To_EmergencyProtocol</bpmn:outgoing>
-      <bpmn:errorEventDefinition id="ErrorEventDefinition_Emergency" errorRef="Error_Emergency" />
-    </bpmn:boundaryEvent>
+    <bpmn:sequenceFlow id="Flow_09" sourceRef="Task_DailyFeeding" targetRef="Task_DailyWalk" />
     
-    <bpmn:sequenceFlow id="Flow_To_EmergencyProtocol" sourceRef="Event_Emergency" targetRef="SubProcess_EmergencyProtocol" />
+    <!-- TASK 6: WALK -->
+    <bpmn:userTask id="Task_DailyWalk" name="Прогулка">
+      <bpmn:extensionElements>
+        <zeebe:formDefinition formId="WalkForm" />
+        <zeebe:assignmentDefinition candidateGroups="care-specialist" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_09</bpmn:incoming>
+      <bpmn:outgoing>Flow_10</bpmn:outgoing>
+    </bpmn:userTask>
     
-    <!-- ========== SUBPROCESS: EMERGENCY PROTOCOL ========== -->
-    <bpmn:subProcess id="SubProcess_EmergencyProtocol" name="Протокол экстренной ситуации">
-      <bpmn:incoming>Flow_To_EmergencyProtocol</bpmn:incoming>
-      <bpmn:outgoing>Flow_From_EmergencyProtocol</bpmn:outgoing>
-      
-      <bpmn:startEvent id="Start_Emergency" name="ЧП">
-        <bpmn:outgoing>Flow_Emerg_To_Form</bpmn:outgoing>
-      </bpmn:startEvent>
-      
-      <bpmn:sequenceFlow id="Flow_Emerg_To_Form" sourceRef="Start_Emergency" targetRef="Task_EmergencyForm" />
-      
-      <bpmn:userTask id="Task_EmergencyForm" name="Зафиксировать ЧП">
-        <bpmn:extensionElements>
-          <zeebe:formDefinition formId="EmergencyForm" />
-          <zeebe:assignmentDefinition candidateGroups="care-specialist" />
-        </bpmn:extensionElements>
-        <bpmn:incoming>Flow_Emerg_To_Form</bpmn:incoming>
-        <bpmn:outgoing>Flow_Emerg_To_Split</bpmn:outgoing>
-      </bpmn:userTask>
-      
-      <bpmn:sequenceFlow id="Flow_Emerg_To_Split" sourceRef="Task_EmergencyForm" targetRef="Gateway_EmergencySplit" />
-      
-      <bpmn:parallelGateway id="Gateway_EmergencySplit">
-        <bpmn:incoming>Flow_Emerg_To_Split</bpmn:incoming>
-        <bpmn:outgoing>Flow_Emerg_To_ContactVet</bpmn:outgoing>
-        <bpmn:outgoing>Flow_Emerg_To_ContactOwner</bpmn:outgoing>
-      </bpmn:parallelGateway>
-      
-      <bpmn:sequenceFlow id="Flow_Emerg_To_ContactVet" sourceRef="Gateway_EmergencySplit" targetRef="Task_ContactVet" />
-      <bpmn:sequenceFlow id="Flow_Emerg_To_ContactOwner" sourceRef="Gateway_EmergencySplit" targetRef="Task_ContactOwner" />
-      
-      <bpmn:serviceTask id="Task_ContactVet" name="Связаться с ветеринаром">
-        <bpmn:extensionElements>
-          <zeebe:taskDefinition type="contact-vet" />
-        </bpmn:extensionElements>
-        <bpmn:incoming>Flow_Emerg_To_ContactVet</bpmn:incoming>
-        <bpmn:outgoing>Flow_Emerg_From_ContactVet</bpmn:outgoing>
-      </bpmn:serviceTask>
-      
-      <bpmn:sequenceFlow id="Flow_Emerg_From_ContactVet" sourceRef="Task_ContactVet" targetRef="Gateway_EmergencyJoin" />
-      
-      <bpmn:serviceTask id="Task_ContactOwner" name="Связаться с владельцем">
-        <bpmn:extensionElements>
-          <zeebe:taskDefinition type="contact-owner" />
-        </bpmn:extensionElements>
-        <bpmn:incoming>Flow_Emerg_To_ContactOwner</bpmn:incoming>
-        <bpmn:outgoing>Flow_Emerg_From_ContactOwner</bpmn:outgoing>
-      </bpmn:serviceTask>
-      
-      <bpmn:sequenceFlow id="Flow_Emerg_From_ContactOwner" sourceRef="Task_ContactOwner" targetRef="Gateway_EmergencyJoin" />
-      
-      <bpmn:parallelGateway id="Gateway_EmergencyJoin">
-        <bpmn:incoming>Flow_Emerg_From_ContactVet</bpmn:incoming>
-        <bpmn:incoming>Flow_Emerg_From_ContactOwner</bpmn:incoming>
-        <bpmn:outgoing>Flow_Emerg_To_TransportGateway</bpmn:outgoing>
-      </bpmn:parallelGateway>
-      
-      <bpmn:sequenceFlow id="Flow_Emerg_To_TransportGateway" sourceRef="Gateway_EmergencyJoin" targetRef="Gateway_TransportNeeded" />
-      
-      <bpmn:exclusiveGateway id="Gateway_TransportNeeded" name="Транспортировка нужна?">
-        <bpmn:incoming>Flow_Emerg_To_TransportGateway</bpmn:incoming>
-        <bpmn:outgoing>Flow_Emerg_To_Transport</bpmn:outgoing>
-        <bpmn:outgoing>Flow_Emerg_Skip_Transport</bpmn:outgoing>
-      </bpmn:exclusiveGateway>
-      
-      <bpmn:sequenceFlow id="Flow_Emerg_To_Transport" name="Да" sourceRef="Gateway_TransportNeeded" targetRef="Task_ArrangeTransport">
-        <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=transportationNeeded = "urgentYes" or transportationNeeded = "scheduledYes"</bpmn:conditionExpression>
-      </bpmn:sequenceFlow>
-      
-      <bpmn:sequenceFlow id="Flow_Emerg_Skip_Transport" name="Нет" sourceRef="Gateway_TransportNeeded" targetRef="End_Emergency">
-        <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=transportationNeeded = "no" or transportationNeeded = "monitoring"</bpmn:conditionExpression>
-      </bpmn:sequenceFlow>
-      
-      <bpmn:serviceTask id="Task_ArrangeTransport" name="Организовать транспортировку">
-        <bpmn:extensionElements>
-          <zeebe:taskDefinition type="arrange-transport" />
-        </bpmn:extensionElements>
-        <bpmn:incoming>Flow_Emerg_To_Transport</bpmn:incoming>
-        <bpmn:outgoing>Flow_Emerg_From_Transport</bpmn:outgoing>
-      </bpmn:serviceTask>
-      
-      <bpmn:sequenceFlow id="Flow_Emerg_From_Transport" sourceRef="Task_ArrangeTransport" targetRef="End_Emergency" />
-      
-      <bpmn:endEvent id="End_Emergency" name="ЧП обработано">
-        <bpmn:incoming>Flow_Emerg_Skip_Transport</bpmn:incoming>
-        <bpmn:incoming>Flow_Emerg_From_Transport</bpmn:incoming>
-      </bpmn:endEvent>
-      
-    </bpmn:subProcess>
+    <bpmn:sequenceFlow id="Flow_10" sourceRef="Task_DailyWalk" targetRef="Task_HealthCheck" />
     
-    <bpmn:sequenceFlow id="Flow_From_EmergencyProtocol" sourceRef="SubProcess_EmergencyProtocol" targetRef="Task_PrepareForDeparture" />
+    <!-- TASK 7: HEALTH CHECK -->
+    <bpmn:userTask id="Task_HealthCheck" name="Мониторинг здоровья">
+      <bpmn:extensionElements>
+        <zeebe:formDefinition formId="HealthCheckForm" />
+        <zeebe:assignmentDefinition candidateGroups="care-specialist" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_10</bpmn:incoming>
+      <bpmn:outgoing>Flow_11</bpmn:outgoing>
+    </bpmn:userTask>
     
-    <!-- ========== NORMAL FLOW CONTINUES ========== -->
-    <bpmn:sequenceFlow id="Flow_To_PrepareForDeparture" sourceRef="SubProcess_DailyCare" targetRef="Task_PrepareForDeparture" />
+    <bpmn:sequenceFlow id="Flow_11" sourceRef="Task_HealthCheck" targetRef="Gateway_MedicationCheck" />
     
-    <!-- ========== TASK: PREPARE FOR DEPARTURE ========== -->
-    <bpmn:userTask id="Task_PrepareForDeparture" name="Подготовить питомца к отъезду">
+    <!-- GATEWAY: MEDICATION -->
+    <bpmn:exclusiveGateway id="Gateway_MedicationCheck" name="Требуются лекарства?">
+      <bpmn:incoming>Flow_11</bpmn:incoming>
+      <bpmn:outgoing>Flow_12_Yes</bpmn:outgoing>
+      <bpmn:outgoing>Flow_12_No</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    
+    <bpmn:sequenceFlow id="Flow_12_Yes" name="Да" sourceRef="Gateway_MedicationCheck" targetRef="Task_Medication">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=requiresMedication = true</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    
+    <bpmn:sequenceFlow id="Flow_12_No" name="Нет" sourceRef="Gateway_MedicationCheck" targetRef="Gateway_MedicationJoin">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=requiresMedication = false or requiresMedication = null</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    
+    <!-- TASK 8: MEDICATION -->
+    <bpmn:userTask id="Task_Medication" name="Дать лекарства">
+      <bpmn:extensionElements>
+        <zeebe:formDefinition formId="MedicationForm" />
+        <zeebe:assignmentDefinition candidateGroups="care-specialist" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_12_Yes</bpmn:incoming>
+      <bpmn:outgoing>Flow_13</bpmn:outgoing>
+    </bpmn:userTask>
+    
+    <bpmn:sequenceFlow id="Flow_13" sourceRef="Task_Medication" targetRef="Gateway_MedicationJoin" />
+    
+    <!-- GATEWAY: MEDICATION JOIN -->
+    <bpmn:exclusiveGateway id="Gateway_MedicationJoin">
+      <bpmn:incoming>Flow_12_No</bpmn:incoming>
+      <bpmn:incoming>Flow_13</bpmn:incoming>
+      <bpmn:outgoing>Flow_14</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    
+    <bpmn:sequenceFlow id="Flow_14" sourceRef="Gateway_MedicationJoin" targetRef="Task_CompatibilityCheck" />
+    
+    <!-- DMN 2 -->
+    <bpmn:businessRuleTask id="Task_CompatibilityCheck" name="Оценить совместимость">
+      <bpmn:extensionElements>
+        <zeebe:calledDecision decisionId="pet_compatibility_check" resultVariable="compatibilityResult" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_14</bpmn:incoming>
+      <bpmn:outgoing>Flow_15</bpmn:outgoing>
+    </bpmn:businessRuleTask>
+    
+    <bpmn:sequenceFlow id="Flow_15" sourceRef="Task_CompatibilityCheck" targetRef="Gateway_PlayDecision" />
+    
+    <!-- GATEWAY: PLAY -->
+    <bpmn:exclusiveGateway id="Gateway_PlayDecision" name="Совместим?">
+      <bpmn:incoming>Flow_15</bpmn:incoming>
+      <bpmn:outgoing>Flow_16_Group</bpmn:outgoing>
+      <bpmn:outgoing>Flow_16_Individual</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    
+    <bpmn:sequenceFlow id="Flow_16_Group" name="Да" sourceRef="Gateway_PlayDecision" targetRef="Task_GroupPlay">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=compatibilityResult.уровеньСовместимости != "Несовместим"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    
+    <bpmn:sequenceFlow id="Flow_16_Individual" name="Нет" sourceRef="Gateway_PlayDecision" targetRef="Task_IndividualPlay">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=compatibilityResult.уровеньСовместимости = "Несовместим"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    
+    <!-- TASK 9: GROUP PLAY -->
+    <bpmn:userTask id="Task_GroupPlay" name="Групповые игры">
+      <bpmn:extensionElements>
+        <zeebe:formDefinition formId="DailyActivityForm" />
+        <zeebe:assignmentDefinition candidateGroups="care-specialist" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_16_Group</bpmn:incoming>
+      <bpmn:outgoing>Flow_17a</bpmn:outgoing>
+    </bpmn:userTask>
+    
+    <bpmn:sequenceFlow id="Flow_17a" sourceRef="Task_GroupPlay" targetRef="Gateway_PlayJoin" />
+    
+    <!-- TASK 10: INDIVIDUAL PLAY -->
+    <bpmn:userTask id="Task_IndividualPlay" name="Индивидуальные игры">
+      <bpmn:extensionElements>
+        <zeebe:formDefinition formId="DailyActivityForm" />
+        <zeebe:assignmentDefinition candidateGroups="care-specialist" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_16_Individual</bpmn:incoming>
+      <bpmn:outgoing>Flow_17b</bpmn:outgoing>
+    </bpmn:userTask>
+    
+    <bpmn:sequenceFlow id="Flow_17b" sourceRef="Task_IndividualPlay" targetRef="Gateway_PlayJoin" />
+    
+    <!-- GATEWAY: PLAY JOIN -->
+    <bpmn:exclusiveGateway id="Gateway_PlayJoin">
+      <bpmn:incoming>Flow_17a</bpmn:incoming>
+      <bpmn:incoming>Flow_17b</bpmn:incoming>
+      <bpmn:outgoing>Flow_18</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    
+    <bpmn:sequenceFlow id="Flow_18" sourceRef="Gateway_PlayJoin" targetRef="Task_OwnerUpdate" />
+    
+    <!-- TASK 11: OWNER UPDATE -->
+    <bpmn:userTask id="Task_OwnerUpdate" name="Отчет владельцу">
+      <bpmn:extensionElements>
+        <zeebe:formDefinition formId="OwnerUpdateForm" />
+        <zeebe:assignmentDefinition candidateGroups="care-specialist" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_18</bpmn:incoming>
+      <bpmn:outgoing>Flow_19</bpmn:outgoing>
+    </bpmn:userTask>
+    
+    <bpmn:sequenceFlow id="Flow_19" sourceRef="Task_OwnerUpdate" targetRef="Task_PrepareForDeparture" />
+    
+    <!-- TASK 12: PREPARE FOR DEPARTURE -->
+    <bpmn:userTask id="Task_PrepareForDeparture" name="Подготовка к отъезду">
       <bpmn:extensionElements>
         <zeebe:formDefinition formId="DepartureForm" />
         <zeebe:assignmentDefinition candidateGroups="care-specialist" />
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_To_PrepareForDeparture</bpmn:incoming>
-      <bpmn:incoming>Flow_From_EmergencyProtocol</bpmn:incoming>
-      <bpmn:outgoing>Flow_To_FinalReport</bpmn:outgoing>
+      <bpmn:incoming>Flow_19</bpmn:incoming>
+      <bpmn:outgoing>Flow_20</bpmn:outgoing>
     </bpmn:userTask>
     
-    <bpmn:sequenceFlow id="Flow_To_FinalReport" sourceRef="Task_PrepareForDeparture" targetRef="Task_CreateFinalReport" />
+    <bpmn:sequenceFlow id="Flow_20" sourceRef="Task_PrepareForDeparture" targetRef="Task_FinalReport" />
     
-    <!-- ========== TASK: FINAL REPORT ========== -->
-    <bpmn:userTask id="Task_CreateFinalReport" name="Создать итоговый отчет">
+    <!-- TASK 13: FINAL REPORT -->
+    <bpmn:userTask id="Task_FinalReport" name="Итоговый отчет">
       <bpmn:extensionElements>
         <zeebe:formDefinition formId="FinalReportForm" />
         <zeebe:assignmentDefinition candidateGroups="care-specialist" />
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_To_FinalReport</bpmn:incoming>
-      <bpmn:outgoing>Flow_To_FinalCheckout</bpmn:outgoing>
+      <bpmn:incoming>Flow_20</bpmn:incoming>
+      <bpmn:outgoing>Flow_21</bpmn:outgoing>
     </bpmn:userTask>
     
-    <bpmn:sequenceFlow id="Flow_To_FinalCheckout" sourceRef="Task_CreateFinalReport" targetRef="Task_FinalCheckout" />
+    <bpmn:sequenceFlow id="Flow_21" sourceRef="Task_FinalReport" targetRef="Task_Checkout" />
     
-    <!-- ========== TASK: FINAL CHECKOUT ========== -->
-    <bpmn:userTask id="Task_FinalCheckout" name="Провести выписку и расчет">
+    <!-- TASK 14: CHECKOUT -->
+    <bpmn:userTask id="Task_Checkout" name="Выписка и расчет">
       <bpmn:extensionElements>
         <zeebe:formDefinition formId="CheckoutForm" />
         <zeebe:assignmentDefinition candidateGroups="specialist-priem" />
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_To_FinalCheckout</bpmn:incoming>
-      <bpmn:outgoing>Flow_To_Feedback</bpmn:outgoing>
+      <bpmn:incoming>Flow_21</bpmn:incoming>
+      <bpmn:outgoing>Flow_22</bpmn:outgoing>
     </bpmn:userTask>
     
-    <bpmn:sequenceFlow id="Flow_To_Feedback" sourceRef="Task_FinalCheckout" targetRef="Task_CollectFeedback" />
+    <bpmn:sequenceFlow id="Flow_22" sourceRef="Task_Checkout" targetRef="Task_Feedback" />
     
-    <!-- ========== TASK: COLLECT FEEDBACK ========== -->
-    <bpmn:userTask id="Task_CollectFeedback" name="Собрать отзыв">
+    <!-- TASK 15: FEEDBACK -->
+    <bpmn:userTask id="Task_Feedback" name="Собрать отзыв">
       <bpmn:extensionElements>
         <zeebe:formDefinition formId="FeedbackForm" />
         <zeebe:assignmentDefinition candidateGroups="specialist-priem" />
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_To_Feedback</bpmn:incoming>
-      <bpmn:outgoing>Flow_To_PostStaySplit</bpmn:outgoing>
+      <bpmn:incoming>Flow_22</bpmn:incoming>
+      <bpmn:outgoing>Flow_23</bpmn:outgoing>
     </bpmn:userTask>
     
-    <bpmn:sequenceFlow id="Flow_To_PostStaySplit" sourceRef="Task_CollectFeedback" targetRef="Gateway_PostStaySplit" />
+    <bpmn:sequenceFlow id="Flow_23" sourceRef="Task_Feedback" targetRef="Gateway_FinalSplit" />
     
-    <!-- ========== PARALLEL GATEWAY: POST STAY ========== -->
-    <bpmn:parallelGateway id="Gateway_PostStaySplit">
-      <bpmn:incoming>Flow_To_PostStaySplit</bpmn:incoming>
-      <bpmn:outgoing>Flow_To_PetLeft</bpmn:outgoing>
-      <bpmn:outgoing>Flow_To_CleanRoom</bpmn:outgoing>
+    <!-- GATEWAY: FINAL SPLIT -->
+    <bpmn:parallelGateway id="Gateway_FinalSplit">
+      <bpmn:incoming>Flow_23</bpmn:incoming>
+      <bpmn:outgoing>Flow_24a</bpmn:outgoing>
+      <bpmn:outgoing>Flow_24b</bpmn:outgoing>
     </bpmn:parallelGateway>
     
-    <bpmn:sequenceFlow id="Flow_To_PetLeft" sourceRef="Gateway_PostStaySplit" targetRef="EndEvent_PetLeft" />
-    <bpmn:sequenceFlow id="Flow_To_CleanRoom" sourceRef="Gateway_PostStaySplit" targetRef="Task_CleanRoom" />
+    <bpmn:sequenceFlow id="Flow_24a" sourceRef="Gateway_FinalSplit" targetRef="Event_PetLeft" />
+    <bpmn:sequenceFlow id="Flow_24b" sourceRef="Gateway_FinalSplit" targetRef="Task_CleanRoom" />
     
-    <!-- ========== END EVENT: PET LEFT ========== -->
-    <bpmn:endEvent id="EndEvent_PetLeft" name="Питомец покинул отель">
-      <bpmn:incoming>Flow_To_PetLeft</bpmn:incoming>
+    <!-- END: PET LEFT -->
+    <bpmn:endEvent id="Event_PetLeft" name="Питомец покинул отель">
+      <bpmn:incoming>Flow_24a</bpmn:incoming>
     </bpmn:endEvent>
     
-    <!-- ========== TASK: CLEAN ROOM ========== -->
-    <bpmn:userTask id="Task_CleanRoom" name="Провести уборку и дезинфекцию номера">
+    <!-- TASK 16: CLEAN ROOM -->
+    <bpmn:userTask id="Task_CleanRoom" name="Уборка номера">
       <bpmn:extensionElements>
         <zeebe:formDefinition formId="CleaningForm" />
         <zeebe:assignmentDefinition candidateGroups="housekeeping" />
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_To_CleanRoom</bpmn:incoming>
-      <bpmn:outgoing>Flow_To_RoomReady</bpmn:outgoing>
+      <bpmn:incoming>Flow_24b</bpmn:incoming>
+      <bpmn:outgoing>Flow_25</bpmn:outgoing>
     </bpmn:userTask>
     
-    <bpmn:sequenceFlow id="Flow_To_RoomReady" sourceRef="Task_CleanRoom" targetRef="EndEvent_RoomReady" />
+    <bpmn:sequenceFlow id="Flow_25" sourceRef="Task_CleanRoom" targetRef="Event_RoomReady" />
     
-    <!-- ========== END EVENT: ROOM READY ========== -->
-    <bpmn:endEvent id="EndEvent_RoomReady" name="Номер готов">
-      <bpmn:incoming>Flow_To_RoomReady</bpmn:incoming>
+    <!-- END: ROOM READY -->
+    <bpmn:endEvent id="Event_RoomReady" name="Номер готов к заселению">
+      <bpmn:incoming>Flow_25</bpmn:incoming>
     </bpmn:endEvent>
     
   </bpmn:process>
   
-  <!-- ========== ERROR DEFINITION ========== -->
-  <bpmn:error id="Error_Emergency" name="EmergencyError" errorCode="EMERGENCY" />
-  
-  <!-- ========== BPMN DIAGRAM (Simplified) ========== -->
+  <!-- ========== BPMN DIAGRAM ========== -->
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_PetHotel">
-      <bpmndi:BPMNShape id="Participant_di" bpmnElement="Participant_PetHotel" isHorizontal="true">
-        <dc:Bounds x="160" y="80" width="2400" height="600" />
+      
+      <!-- PARTICIPANT / POOL -->
+      <bpmndi:BPMNShape id="Participant_PetHotel_di" bpmnElement="Participant_PetHotel" isHorizontal="true">
+        <dc:Bounds x="160" y="80" width="3500" height="820" />
+        <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
+      
+      <!-- LANE 1: RECEPTION -->
+      <bpmndi:BPMNShape id="Lane_Reception_di" bpmnElement="Lane_Reception" isHorizontal="true">
+        <dc:Bounds x="190" y="80" width="3470" height="250" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      
+      <!-- LANE 2: VETERINARIAN -->
+      <bpmndi:BPMNShape id="Lane_Veterinarian_di" bpmnElement="Lane_Veterinarian" isHorizontal="true">
+        <dc:Bounds x="190" y="330" width="3470" height="150" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      
+      <!-- LANE 3: CARE SPECIALIST -->
+      <bpmndi:BPMNShape id="Lane_CareSpecialist_di" bpmnElement="Lane_CareSpecialist" isHorizontal="true">
+        <dc:Bounds x="190" y="480" width="3470" height="270" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      
+      <!-- LANE 4: HOUSEKEEPING -->
+      <bpmndi:BPMNShape id="Lane_Housekeeping_di" bpmnElement="Lane_Housekeeping" isHorizontal="true">
+        <dc:Bounds x="190" y="750" width="3470" height="150" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      
+      <!-- ========== SHAPES IN LANE 1 (RECEPTION) ========== -->
+      
+      <!-- Start Event -->
+      <bpmndi:BPMNShape id="Event_Start_di" bpmnElement="Event_Start">
+        <dc:Bounds x="252" y="182" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="231" y="225" width="78" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <!-- Task 1: Register Booking -->
+      <bpmndi:BPMNShape id="Task_RegisterBooking_di" bpmnElement="Task_RegisterBooking">
+        <dc:Bounds x="340" y="160" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      
+      <!-- DMN 1: Check Vaccination -->
+      <bpmndi:BPMNShape id="Task_CheckVaccination_di" bpmnElement="Task_CheckVaccination">
+        <dc:Bounds x="500" y="160" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      
+      <!-- Gateway: Vaccination Check -->
+      <bpmndi:BPMNShape id="Gateway_VaccinationCheck_di" bpmnElement="Gateway_VaccinationCheck" isMarkerVisible="true">
+        <dc:Bounds x="665" y="175" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="649" y="145" width="82" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <!-- End: Rejected -->
+      <bpmndi:BPMNShape id="Event_Rejected_di" bpmnElement="Event_Rejected">
+        <dc:Bounds x="672" y="272" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="649" y="315" width="82" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <!-- Service Task: Generate Contract -->
+      <bpmndi:BPMNShape id="Task_GenerateContract_di" bpmnElement="Task_GenerateContract">
+        <dc:Bounds x="780" y="160" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      
+      <!-- Task 2: Check In -->
+      <bpmndi:BPMNShape id="Task_CheckIn_di" bpmnElement="Task_CheckIn">
+        <dc:Bounds x="940" y="160" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      
+      <!-- Gateway: Check-in Split -->
+      <bpmndi:BPMNShape id="Gateway_CheckInSplit_di" bpmnElement="Gateway_CheckInSplit">
+        <dc:Bounds x="1105" y="175" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      
+      <!-- Task 14: Checkout -->
+      <bpmndi:BPMNShape id="Task_Checkout_di" bpmnElement="Task_Checkout">
+        <dc:Bounds x="3030" y="160" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      
+      <!-- Task 15: Feedback -->
+      <bpmndi:BPMNShape id="Task_Feedback_di" bpmnElement="Task_Feedback">
+        <dc:Bounds x="3180" y="160" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      
+      <!-- Gateway: Final Split -->
+      <bpmndi:BPMNShape id="Gateway_FinalSplit_di" bpmnElement="Gateway_FinalSplit">
+        <dc:Bounds x="3345" y="175" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      
+      <!-- End: Pet Left -->
+      <bpmndi:BPMNShape id="Event_PetLeft_di" bpmnElement="Event_PetLeft">
+        <dc:Bounds x="3462" y="182" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3437" y="225" width="86" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <!-- ========== SHAPES IN LANE 2 (VETERINARIAN) ========== -->
+      
+      <!-- Task 3: Vet Check -->
+      <bpmndi:BPMNShape id="Task_VetCheck_di" bpmnElement="Task_VetCheck">
+        <dc:Bounds x="1200" y="365" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      
+      <!-- Gateway: Check-in Join -->
+      <bpmndi:BPMNShape id="Gateway_CheckInJoin_di" bpmnElement="Gateway_CheckInJoin">
+        <dc:Bounds x="1365" y="380" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      
+      <!-- ========== SHAPES IN LANE 3 (CARE SPECIALIST) ========== -->
+      
+      <!-- Task 4: Assign Room -->
+      <bpmndi:BPMNShape id="Task_AssignRoom_di" bpmnElement="Task_AssignRoom">
+        <dc:Bounds x="1200" y="575" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      
+      <!-- Task 5: Daily Feeding -->
+      <bpmndi:BPMNShape id="Task_DailyFeeding_di" bpmnElement="Task_DailyFeeding">
+        <dc:Bounds x="1470" y="575" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      
+      <!-- Task 6: Daily Walk -->
+      <bpmndi:BPMNShape id="Task_DailyWalk_di" bpmnElement="Task_DailyWalk">
+        <dc:Bounds x="1620" y="575" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      
+      <!-- Task 7: Health Check -->
+      <bpmndi:BPMNShape id="Task_HealthCheck_di" bpmnElement="Task_HealthCheck">
+        <dc:Bounds x="1770" y="575" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      
+      <!-- Gateway: Medication Check -->
+      <bpmndi:BPMNShape id="Gateway_MedicationCheck_di" bpmnElement="Gateway_MedicationCheck" isMarkerVisible="true">
+        <dc:Bounds x="1925" y="590" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1908" y="560" width="85" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <!-- Task 8: Medication -->
+      <bpmndi:BPMNShape id="Task_Medication_di" bpmnElement="Task_Medication">
+        <dc:Bounds x="1900" y="680" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      
+      <!-- Gateway: Medication Join -->
+      <bpmndi:BPMNShape id="Gateway_MedicationJoin_di" bpmnElement="Gateway_MedicationJoin" isMarkerVisible="true">
+        <dc:Bounds x="2065" y="590" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      
+      <!-- DMN 2: Compatibility Check -->
+      <bpmndi:BPMNShape id="Task_CompatibilityCheck_di" bpmnElement="Task_CompatibilityCheck">
+        <dc:Bounds x="2170" y="575" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      
+      <!-- Gateway: Play Decision -->
+      <bpmndi:BPMNShape id="Gateway_PlayDecision_di" bpmnElement="Gateway_PlayDecision" isMarkerVisible="true">
+        <dc:Bounds x="2325" y="590" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2317" y="560" width="65" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <!-- Task 9: Group Play -->
+      <bpmndi:BPMNShape id="Task_GroupPlay_di" bpmnElement="Task_GroupPlay">
+        <dc:Bounds x="2430" y="505" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      
+      <!-- Task 10: Individual Play -->
+      <bpmndi:BPMNShape id="Task_IndividualPlay_di" bpmnElement="Task_IndividualPlay">
+        <dc:Bounds x="2430" y="635" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      
+      <!-- Gateway: Play Join -->
+      <bpmndi:BPMNShape id="Gateway_PlayJoin_di" bpmnElement="Gateway_PlayJoin" isMarkerVisible="true">
+        <dc:Bounds x="2585" y="590" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      
+      <!-- Task 11: Owner Update -->
+      <bpmndi:BPMNShape id="Task_OwnerUpdate_di" bpmnElement="Task_OwnerUpdate">
+        <dc:Bounds x="2690" y="575" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      
+      <!-- Task 12: Prepare for Departure -->
+      <bpmndi:BPMNShape id="Task_PrepareForDeparture_di" bpmnElement="Task_PrepareForDeparture">
+        <dc:Bounds x="2840" y="575" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      
+      <!-- Task 13: Final Report -->
+      <bpmndi:BPMNShape id="Task_FinalReport_di" bpmnElement="Task_FinalReport">
+        <dc:Bounds x="2990" y="575" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      
+      <!-- ========== SHAPES IN LANE 4 (HOUSEKEEPING) ========== -->
+      
+      <!-- Task 16: Clean Room -->
+      <bpmndi:BPMNShape id="Task_CleanRoom_di" bpmnElement="Task_CleanRoom">
+        <dc:Bounds x="3320" y="785" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      
+      <!-- End: Room Ready -->
+      <bpmndi:BPMNShape id="Event_RoomReady_di" bpmnElement="Event_RoomReady">
+        <dc:Bounds x="3482" y="807" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3459" y="850" width="82" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      
+      <!-- ========== EDGES ========== -->
+      
+      <bpmndi:BPMNEdge id="Flow_01_di" bpmnElement="Flow_01">
+        <di:waypoint x="288" y="200" />
+        <di:waypoint x="340" y="200" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Flow_02_di" bpmnElement="Flow_02">
+        <di:waypoint x="440" y="200" />
+        <di:waypoint x="500" y="200" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Flow_03_di" bpmnElement="Flow_03">
+        <di:waypoint x="600" y="200" />
+        <di:waypoint x="665" y="200" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Flow_Approved_di" bpmnElement="Flow_Approved">
+        <di:waypoint x="715" y="200" />
+        <di:waypoint x="780" y="200" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="739" y="182" width="14" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Flow_Rejected_di" bpmnElement="Flow_Rejected">
+        <di:waypoint x="690" y="225" />
+        <di:waypoint x="690" y="272" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="694" y="246" width="20" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Flow_04_di" bpmnElement="Flow_04">
+        <di:waypoint x="880" y="200" />
+        <di:waypoint x="940" y="200" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Flow_05_di" bpmnElement="Flow_05">
+        <di:waypoint x="1040" y="200" />
+        <di:waypoint x="1105" y="200" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Flow_06a_di" bpmnElement="Flow_06a">
+        <di:waypoint x="1130" y="225" />
+        <di:waypoint x="1130" y="405" />
+        <di:waypoint x="1200" y="405" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Flow_06b_di" bpmnElement="Flow_06b">
+        <di:waypoint x="1130" y="225" />
+        <di:waypoint x="1130" y="615" />
+        <di:waypoint x="1200" y="615" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Flow_07a_di" bpmnElement="Flow_07a">
+        <di:waypoint x="1300" y="405" />
+        <di:waypoint x="1365" y="405" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Flow_07b_di" bpmnElement="Flow_07b">
+        <di:waypoint x="1300" y="615" />
+        <di:waypoint x="1390" y="615" />
+        <di:waypoint x="1390" y="430" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Flow_08_di" bpmnElement="Flow_08">
+        <di:waypoint x="1415" y="405" />
+        <di:waypoint x="1520" y="405" />
+        <di:waypoint x="1520" y="575" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Flow_09_di" bpmnElement="Flow_09">
+        <di:waypoint x="1570" y="615" />
+        <di:waypoint x="1620" y="615" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Flow_10_di" bpmnElement="Flow_10">
+        <di:waypoint x="1720" y="615" />
+        <di:waypoint x="1770" y="615" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Flow_11_di" bpmnElement="Flow_11">
+        <di:waypoint x="1870" y="615" />
+        <di:waypoint x="1925" y="615" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Flow_12_Yes_di" bpmnElement="Flow_12_Yes">
+        <di:waypoint x="1950" y="640" />
+        <di:waypoint x="1950" y="680" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1954" y="657" width="14" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Flow_12_No_di" bpmnElement="Flow_12_No">
+        <di:waypoint x="1975" y="615" />
+        <di:waypoint x="2065" y="615" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2011" y="597" width="20" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Flow_13_di" bpmnElement="Flow_13">
+        <di:waypoint x="2000" y="720" />
+        <di:waypoint x="2090" y="720" />
+        <di:waypoint x="2090" y="640" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Flow_14_di" bpmnElement="Flow_14">
+        <di:waypoint x="2115" y="615" />
+        <di:waypoint x="2170" y="615" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Flow_15_di" bpmnElement="Flow_15">
+        <di:waypoint x="2270" y="615" />
+        <di:waypoint x="2325" y="615" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Flow_16_Group_di" bpmnElement="Flow_16_Group">
+        <di:waypoint x="2350" y="590" />
+        <di:waypoint x="2350" y="545" />
+        <di:waypoint x="2430" y="545" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2356" y="565" width="14" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Flow_16_Individual_di" bpmnElement="Flow_16_Individual">
+        <di:waypoint x="2350" y="640" />
+        <di:waypoint x="2350" y="675" />
+        <di:waypoint x="2430" y="675" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2354" y="655" width="20" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Flow_17a_di" bpmnElement="Flow_17a">
+        <di:waypoint x="2530" y="545" />
+        <di:waypoint x="2610" y="545" />
+        <di:waypoint x="2610" y="590" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Flow_17b_di" bpmnElement="Flow_17b">
+        <di:waypoint x="2530" y="675" />
+        <di:waypoint x="2610" y="675" />
+        <di:waypoint x="2610" y="640" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Flow_18_di" bpmnElement="Flow_18">
+        <di:waypoint x="2635" y="615" />
+        <di:waypoint x="2690" y="615" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Flow_19_di" bpmnElement="Flow_19">
+        <di:waypoint x="2790" y="615" />
+        <di:waypoint x="2840" y="615" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Flow_20_di" bpmnElement="Flow_20">
+        <di:waypoint x="2940" y="615" />
+        <di:waypoint x="2990" y="615" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Flow_21_di" bpmnElement="Flow_21">
+        <di:waypoint x="3040" y="575" />
+        <di:waypoint x="3040" y="240" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Flow_22_di" bpmnElement="Flow_22">
+        <di:waypoint x="3130" y="200" />
+        <di:waypoint x="3180" y="200" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Flow_23_di" bpmnElement="Flow_23">
+        <di:waypoint x="3280" y="200" />
+        <di:waypoint x="3345" y="200" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Flow_24a_di" bpmnElement="Flow_24a">
+        <di:waypoint x="3395" y="200" />
+        <di:waypoint x="3462" y="200" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Flow_24b_di" bpmnElement="Flow_24b">
+        <di:waypoint x="3370" y="225" />
+        <di:waypoint x="3370" y="785" />
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge id="Flow_25_di" bpmnElement="Flow_25">
+        <di:waypoint x="3420" y="825" />
+        <di:waypoint x="3482" y="825" />
+      </bpmndi:BPMNEdge>
+      
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
   
