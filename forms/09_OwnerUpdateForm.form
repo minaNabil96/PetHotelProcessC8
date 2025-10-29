@@ -1,0 +1,214 @@
+{
+  "schemaVersion": 13,
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.36.1"
+  },
+  "components": [
+    {
+      "text": "## Отчет владельцу",
+      "type": "text",
+      "id": "Field_Header",
+      "layout": {
+        "row": "Row_0"
+      }
+    },
+    {
+      "label": "Питомец",
+      "type": "textfield",
+      "id": "Field_PetName",
+      "key": "petName",
+      "layout": {
+        "row": "Row_1"
+      },
+      "readonly": true
+    },
+    {
+      "label": "Владелец",
+      "type": "textfield",
+      "id": "Field_ClientName",
+      "key": "clientName",
+      "layout": {
+        "row": "Row_2"
+      },
+      "readonly": true
+    },
+    {
+      "label": "Дата отчета",
+      "type": "datetime",
+      "subtype": "date",
+      "id": "Field_ReportDate",
+      "key": "updateReportDate",
+      "dateLabel": "Дата",
+      "layout": {
+        "row": "Row_3"
+      },
+      "defaultValue": "=now()"
+    },
+    {
+      "label": "Общее состояние",
+      "type": "select",
+      "id": "Field_OverallStatus",
+      "key": "overallStatus",
+      "layout": {
+        "row": "Row_4"
+      },
+      "validate": {
+        "required": true
+      },
+      "values": [
+        {
+          "label": "Отлично себя чувствует",
+          "value": "excellent"
+        },
+        {
+          "label": "Хорошо адаптировался",
+          "value": "good"
+        },
+        {
+          "label": "Нормально",
+          "value": "ok"
+        },
+        {
+          "label": "Требует внимания",
+          "value": "needsAttention"
+        }
+      ]
+    },
+    {
+      "label": "Настроение",
+      "type": "select",
+      "id": "Field_MoodUpdate",
+      "key": "moodUpdate",
+      "layout": {
+        "row": "Row_5"
+      },
+      "values": [
+        {
+          "label": "Веселый и игривый",
+          "value": "happyPlayful"
+        },
+        {
+          "label": "Спокойный",
+          "value": "calm"
+        },
+        {
+          "label": "Скучает",
+          "value": "missing"
+        }
+      ]
+    },
+    {
+      "label": "Активности сегодня",
+      "type": "checklist",
+      "id": "Field_ActivitiesCompleted",
+      "key": "activitiesCompleted",
+      "layout": {
+        "row": "Row_6"
+      },
+      "values": [
+        {
+          "label": "Прогулка",
+          "value": "walk"
+        },
+        {
+          "label": "Игры",
+          "value": "play"
+        },
+        {
+          "label": "Кормление",
+          "value": "feeding"
+        },
+        {
+          "label": "Общение с другими животными",
+          "value": "socialization"
+        }
+      ]
+    },
+    {
+      "label": "Аппетит",
+      "type": "select",
+      "id": "Field_AppetiteUpdate",
+      "key": "appetiteUpdate",
+      "layout": {
+        "row": "Row_7"
+      },
+      "values": [
+        {
+          "label": "Отличный",
+          "value": "excellent"
+        },
+        {
+          "label": "Нормальный",
+          "value": "normal"
+        },
+        {
+          "label": "Пониженный",
+          "value": "reduced"
+        }
+      ]
+    },
+    {
+      "label": "Фото/видео прикреплены?",
+      "type": "checkbox",
+      "id": "Field_MediaAttached",
+      "key": "mediaAttached",
+      "layout": {
+        "row": "Row_8"
+      }
+    },
+    {
+      "label": "Текст сообщения владельцу",
+      "type": "textarea",
+      "id": "Field_MessageToOwner",
+      "key": "messageToOwner",
+      "layout": {
+        "row": "Row_9"
+      },
+      "validate": {
+        "required": true,
+        "maxLength": 500
+      }
+    },
+    {
+      "label": "Канал отправки",
+      "type": "select",
+      "id": "Field_CommunicationChannel",
+      "key": "communicationChannel",
+      "layout": {
+        "row": "Row_10"
+      },
+      "values": [
+        {
+          "label": "Email",
+          "value": "email"
+        },
+        {
+          "label": "SMS",
+          "value": "sms"
+        },
+        {
+          "label": "WhatsApp",
+          "value": "whatsapp"
+        },
+        {
+          "label": "Telegram",
+          "value": "telegram"
+        }
+      ]
+    },
+    {
+      "label": "Отчет отправлен?",
+      "type": "checkbox",
+      "id": "Field_UpdateSent",
+      "key": "updateSent",
+      "layout": {
+        "row": "Row_11"
+      }
+    }
+  ],
+  "type": "default",
+  "id": "OwnerUpdateForm",
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.5.0"
+}

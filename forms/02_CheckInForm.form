@@ -1,0 +1,143 @@
+{
+  "schemaVersion": 13,
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.36.1"
+  },
+  "components": [
+    {
+      "text": "## Регистрация заезда",
+      "type": "text",
+      "id": "Field_Header",
+      "layout": {
+        "row": "Row_0"
+      }
+    },
+    {
+      "label": "Питомец",
+      "type": "textfield",
+      "id": "Field_PetNameDisplay",
+      "key": "petName",
+      "layout": {
+        "row": "Row_1"
+      },
+      "readonly": true
+    },
+    {
+      "label": "Владелец",
+      "type": "textfield",
+      "id": "Field_ClientNameDisplay",
+      "key": "clientName",
+      "layout": {
+        "row": "Row_2"
+      },
+      "readonly": true
+    },
+    {
+      "label": "Документы вакцинации проверены?",
+      "type": "checkbox",
+      "id": "Field_VaccinationDocsChecked",
+      "key": "vaccinationDocsChecked",
+      "layout": {
+        "row": "Row_3"
+      },
+      "validate": {
+        "required": true
+      }
+    },
+    {
+      "label": "Договор подписан?",
+      "type": "checkbox",
+      "id": "Field_ContractSigned",
+      "key": "contractSigned",
+      "layout": {
+        "row": "Row_4"
+      },
+      "validate": {
+        "required": true
+      }
+    },
+    {
+      "label": "Номер договора",
+      "type": "textfield",
+      "id": "Field_ContractNumber",
+      "key": "contractNumber",
+      "layout": {
+        "row": "Row_5"
+      },
+      "validate": {
+        "required": true
+      }
+    },
+    {
+      "label": "Личные вещи питомца переданы?",
+      "type": "checkbox",
+      "id": "Field_PersonalItemsReceived",
+      "key": "personalItemsReceived",
+      "layout": {
+        "row": "Row_6"
+      }
+    },
+    {
+      "label": "Список переданных вещей",
+      "type": "textarea",
+      "id": "Field_ItemsList",
+      "key": "itemsList",
+      "layout": {
+        "row": "Row_7"
+      }
+    },
+    {
+      "label": "Дополнительные услуги",
+      "type": "checklist",
+      "id": "Field_AdditionalServices",
+      "key": "additionalServices",
+      "layout": {
+        "row": "Row_8"
+      },
+      "values": [
+        {
+          "label": "Груминг",
+          "value": "grooming"
+        },
+        {
+          "label": "Купание",
+          "value": "bathing"
+        },
+        {
+          "label": "Стрижка когтей",
+          "value": "nailTrimming"
+        },
+        {
+          "label": "Дополнительные прогулки",
+          "value": "extraWalks"
+        }
+      ]
+    },
+    {
+      "label": "Время регистрации",
+      "type": "datetime",
+      "id": "Field_CheckInTime",
+      "key": "checkInTime",
+      "dateLabel": "Дата",
+      "timeLabel": "Время",
+      "layout": {
+        "row": "Row_9"
+      },
+      "defaultValue": "=now()"
+    },
+    {
+      "label": "Примечания",
+      "type": "textarea",
+      "id": "Field_CheckInNotes",
+      "key": "checkInNotes",
+      "layout": {
+        "row": "Row_10"
+      }
+    }
+  ],
+  "type": "default",
+  "id": "CheckInForm",
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.5.0"
+}

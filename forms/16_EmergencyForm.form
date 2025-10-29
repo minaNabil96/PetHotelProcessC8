@@ -1,0 +1,357 @@
+{
+  "schemaVersion": 13,
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.36.1"
+  },
+  "components": [
+    {
+      "text": "## ⚠️ ЭКСТРЕННАЯ СИТУАЦИЯ",
+      "type": "text",
+      "id": "Field_Header",
+      "layout": {
+        "row": "Row_0"
+      }
+    },
+    {
+      "label": "Питомец",
+      "type": "textfield",
+      "id": "Field_PetName",
+      "key": "petName",
+      "layout": {
+        "row": "Row_1"
+      },
+      "readonly": true
+    },
+    {
+      "label": "Время возникновения ЧП",
+      "type": "datetime",
+      "id": "Field_EmergencyTime",
+      "key": "emergencyTime",
+      "dateLabel": "Дата",
+      "timeLabel": "Время",
+      "layout": {
+        "row": "Row_2"
+      },
+      "defaultValue": "=now()"
+    },
+    {
+      "label": "Тип экстренной ситуации",
+      "type": "select",
+      "id": "Field_EmergencyType",
+      "key": "emergencyType",
+      "layout": {
+        "row": "Row_3"
+      },
+      "validate": {
+        "required": true
+      },
+      "values": [
+        {
+          "label": "Травма",
+          "value": "injury"
+        },
+        {
+          "label": "Резкое ухудшение здоровья",
+          "value": "suddenIllness"
+        },
+        {
+          "label": "Отравление",
+          "value": "poisoning"
+        },
+        {
+          "label": "Удушье",
+          "value": "choking"
+        },
+        {
+          "label": "Судороги",
+          "value": "seizure"
+        },
+        {
+          "label": "Агрессия/драка",
+          "value": "aggression"
+        },
+        {
+          "label": "Другое",
+          "value": "other"
+        }
+      ]
+    },
+    {
+      "label": "Описание ситуации",
+      "type": "textarea",
+      "id": "Field_EmergencyDescription",
+      "key": "emergencyDescription",
+      "layout": {
+        "row": "Row_4"
+      },
+      "validate": {
+        "required": true
+      }
+    },
+    {
+      "label": "Симптомы",
+      "type": "checklist",
+      "id": "Field_Symptoms",
+      "key": "emergencySymptoms",
+      "layout": {
+        "row": "Row_5"
+      },
+      "values": [
+        {
+          "label": "Кровотечение",
+          "value": "bleeding"
+        },
+        {
+          "label": "Затрудненное дыхание",
+          "value": "breathingDifficulty"
+        },
+        {
+          "label": "Потеря сознания",
+          "value": "unconscious"
+        },
+        {
+          "label": "Рвота",
+          "value": "vomiting"
+        },
+        {
+          "label": "Диарея",
+          "value": "diarrhea"
+        },
+        {
+          "label": "Хромота",
+          "value": "limping"
+        },
+        {
+          "label": "Дезориентация",
+          "value": "disorientation"
+        }
+      ]
+    },
+    {
+      "text": "### Принятые меры",
+      "type": "text",
+      "id": "Field_ActionsHeader",
+      "layout": {
+        "row": "Row_6"
+      }
+    },
+    {
+      "label": "Первая помощь оказана?",
+      "type": "checkbox",
+      "id": "Field_FirstAidGiven",
+      "key": "firstAidGiven",
+      "layout": {
+        "row": "Row_7"
+      }
+    },
+    {
+      "label": "Описание первой помощи",
+      "type": "textarea",
+      "id": "Field_FirstAidDescription",
+      "key": "firstAidDescription",
+      "layout": {
+        "row": "Row_8"
+      }
+    },
+    {
+      "label": "Ветеринар уведомлен?",
+      "type": "checkbox",
+      "id": "Field_VetNotified",
+      "key": "vetNotified",
+      "layout": {
+        "row": "Row_9"
+      },
+      "validate": {
+        "required": true
+      }
+    },
+    {
+      "label": "Имя ветеринара",
+      "type": "textfield",
+      "id": "Field_VetNameContacted",
+      "key": "vetNameContacted",
+      "layout": {
+        "row": "Row_10"
+      }
+    },
+    {
+      "label": "Время связи с ветеринаром",
+      "type": "datetime",
+      "id": "Field_VetContactTime",
+      "key": "vetContactTime",
+      "dateLabel": "Дата",
+      "timeLabel": "Время",
+      "layout": {
+        "row": "Row_11"
+      }
+    },
+    {
+      "label": "Владелец уведомлен?",
+      "type": "checkbox",
+      "id": "Field_OwnerNotified",
+      "key": "ownerNotified",
+      "layout": {
+        "row": "Row_12"
+      },
+      "validate": {
+        "required": true
+      }
+    },
+    {
+      "label": "Время уведомления владельца",
+      "type": "datetime",
+      "id": "Field_OwnerNotificationTime",
+      "key": "ownerNotificationTime",
+      "dateLabel": "Дата",
+      "timeLabel": "Время",
+      "layout": {
+        "row": "Row_13"
+      }
+    },
+    {
+      "label": "Реакция владельца",
+      "type": "textarea",
+      "id": "Field_OwnerReaction",
+      "key": "ownerReaction",
+      "layout": {
+        "row": "Row_14"
+      }
+    },
+    {
+      "label": "Требуется транспортировка в клинику?",
+      "type": "select",
+      "id": "Field_TransportationNeeded",
+      "key": "transportationNeeded",
+      "layout": {
+        "row": "Row_15"
+      },
+      "validate": {
+        "required": true
+      },
+      "values": [
+        {
+          "label": "Да, экстренно",
+          "value": "urgentYes"
+        },
+        {
+          "label": "Да, плановая",
+          "value": "scheduledYes"
+        },
+        {
+          "label": "Нет",
+          "value": "no"
+        },
+        {
+          "label": "Под наблюдением",
+          "value": "monitoring"
+        }
+      ]
+    },
+    {
+      "label": "Транспортировка организована?",
+      "type": "checkbox",
+      "id": "Field_TransportArranged",
+      "key": "transportArranged",
+      "layout": {
+        "row": "Row_16"
+      }
+    },
+    {
+      "label": "Время транспортировки",
+      "type": "datetime",
+      "id": "Field_TransportTime",
+      "key": "transportTime",
+      "dateLabel": "Дата",
+      "timeLabel": "Время",
+      "layout": {
+        "row": "Row_17"
+      }
+    },
+    {
+      "label": "Название клиники",
+      "type": "textfield",
+      "id": "Field_ClinicName",
+      "key": "clinicName",
+      "layout": {
+        "row": "Row_18"
+      }
+    },
+    {
+      "text": "### Результат",
+      "type": "text",
+      "id": "Field_OutcomeHeader",
+      "layout": {
+        "row": "Row_19"
+      }
+    },
+    {
+      "label": "Текущее состояние питомца",
+      "type": "select",
+      "id": "Field_CurrentCondition",
+      "key": "currentCondition",
+      "layout": {
+        "row": "Row_20"
+      },
+      "values": [
+        {
+          "label": "Стабилизировалось",
+          "value": "stabilized"
+        },
+        {
+          "label": "Улучшается",
+          "value": "improving"
+        },
+        {
+          "label": "Без изменений",
+          "value": "unchanged"
+        },
+        {
+          "label": "Ухудшается",
+          "value": "deteriorating"
+        },
+        {
+          "label": "В клинике",
+          "value": "atClinic"
+        }
+      ]
+    },
+    {
+      "label": "Дополнительные наблюдения",
+      "type": "textarea",
+      "id": "Field_AdditionalObservations",
+      "key": "additionalObservations",
+      "layout": {
+        "row": "Row_21"
+      }
+    },
+    {
+      "label": "Сотрудник, обнаруживший ЧП",
+      "type": "textfield",
+      "id": "Field_ReportedBy",
+      "key": "reportedBy",
+      "layout": {
+        "row": "Row_22"
+      },
+      "validate": {
+        "required": true
+      }
+    },
+    {
+      "label": "Сотрудник, принявший меры",
+      "type": "textfield",
+      "id": "Field_ActionTakenBy",
+      "key": "actionTakenBy",
+      "layout": {
+        "row": "Row_23"
+      },
+      "validate": {
+        "required": true
+      }
+    }
+  ],
+  "type": "default",
+  "id": "EmergencyForm",
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.5.0"
+}

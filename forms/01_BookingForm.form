@@ -1,0 +1,387 @@
+{
+  "schemaVersion": 13,
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.36.1"
+  },
+  "components": [
+    {
+      "text": "## Информация о клиенте",
+      "type": "text",
+      "id": "Field_ClientHeader",
+      "layout": {
+        "row": "Row_0"
+      }
+    },
+    {
+      "label": "Имя клиента",
+      "type": "textfield",
+      "id": "Field_ClientName",
+      "key": "clientName",
+      "layout": {
+        "row": "Row_1"
+      },
+      "validate": {
+        "required": true,
+        "minLength": 2,
+        "maxLength": 100
+      }
+    },
+    {
+      "label": "Контактный телефон",
+      "type": "textfield",
+      "id": "Field_ClientContact",
+      "key": "clientContact",
+      "layout": {
+        "row": "Row_2"
+      },
+      "validate": {
+        "required": true
+      }
+    },
+    {
+      "label": "Email",
+      "type": "textfield",
+      "id": "Field_ClientEmail",
+      "key": "clientEmail",
+      "layout": {
+        "row": "Row_3"
+      },
+      "validate": {
+        "required": true,
+        "pattern": "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$"
+      }
+    },
+    {
+      "label": "Контакт для экстренной связи",
+      "type": "textfield",
+      "id": "Field_EmergencyContact",
+      "key": "emergencyContact",
+      "layout": {
+        "row": "Row_4"
+      },
+      "validate": {
+        "required": true
+      }
+    },
+    {
+      "text": "## Информация о питомце",
+      "type": "text",
+      "id": "Field_PetHeader",
+      "layout": {
+        "row": "Row_5"
+      }
+    },
+    {
+      "label": "Кличка питомца",
+      "type": "textfield",
+      "id": "Field_PetName",
+      "key": "petName",
+      "layout": {
+        "row": "Row_6"
+      },
+      "validate": {
+        "required": true
+      }
+    },
+    {
+      "label": "Вид питомца",
+      "type": "select",
+      "id": "Field_PetType",
+      "key": "petType",
+      "layout": {
+        "row": "Row_7"
+      },
+      "validate": {
+        "required": true
+      },
+      "values": [
+        {
+          "label": "Собака",
+          "value": "dog"
+        },
+        {
+          "label": "Кошка",
+          "value": "cat"
+        }
+      ]
+    },
+    {
+      "label": "Порода",
+      "type": "textfield",
+      "id": "Field_PetBreed",
+      "key": "petBreed",
+      "layout": {
+        "row": "Row_8"
+      },
+      "validate": {
+        "required": false
+      }
+    },
+    {
+      "label": "Возраст (лет)",
+      "type": "number",
+      "id": "Field_PetAge",
+      "key": "petAge",
+      "layout": {
+        "row": "Row_9"
+      },
+      "validate": {
+        "required": true,
+        "min": 0,
+        "max": 30
+      }
+    },
+    {
+      "label": "Темперамент",
+      "type": "select",
+      "id": "Field_Temperament",
+      "key": "temperament",
+      "layout": {
+        "row": "Row_10"
+      },
+      "validate": {
+        "required": true
+      },
+      "values": [
+        {
+          "label": "Спокойный",
+          "value": "Спокойный"
+        },
+        {
+          "label": "Активный",
+          "value": "Активный"
+        },
+        {
+          "label": "Агрессивный",
+          "value": "Агрессивный"
+        }
+      ]
+    },
+    {
+      "label": "Уровень социализации",
+      "type": "select",
+      "id": "Field_SocialLevel",
+      "key": "socialLevel",
+      "layout": {
+        "row": "Row_11"
+      },
+      "validate": {
+        "required": true
+      },
+      "values": [
+        {
+          "label": "Высокий",
+          "value": "Высокий"
+        },
+        {
+          "label": "Средний",
+          "value": "Средний"
+        },
+        {
+          "label": "Низкий",
+          "value": "Низкий"
+        }
+      ]
+    },
+    {
+      "text": "## Медицинская информация",
+      "type": "text",
+      "id": "Field_MedicalHeader",
+      "layout": {
+        "row": "Row_12"
+      }
+    },
+    {
+      "label": "Дата последней вакцинации",
+      "type": "datetime",
+      "subtype": "date",
+      "id": "Field_LastVaccinationDate",
+      "key": "lastVaccinationDate",
+      "dateLabel": "Дата",
+      "layout": {
+        "row": "Row_13"
+      },
+      "validate": {
+        "required": true
+      }
+    },
+    {
+      "label": "Тип вакцины",
+      "type": "textfield",
+      "id": "Field_VaccinationType",
+      "key": "vaccinationType",
+      "layout": {
+        "row": "Row_14"
+      },
+      "validate": {
+        "required": true
+      }
+    },
+    {
+      "label": "Контакт ветеринара",
+      "type": "textfield",
+      "id": "Field_VetContact",
+      "key": "vetContact",
+      "layout": {
+        "row": "Row_15"
+      },
+      "validate": {
+        "required": true
+      }
+    },
+    {
+      "label": "Аллергии",
+      "type": "textarea",
+      "id": "Field_Allergies",
+      "key": "allergies",
+      "layout": {
+        "row": "Row_16"
+      }
+    },
+    {
+      "label": "Медицинские особенности",
+      "type": "textarea",
+      "id": "Field_MedicalNotes",
+      "key": "medicalNotes",
+      "layout": {
+        "row": "Row_17"
+      }
+    },
+    {
+      "label": "Требуются регулярные лекарства?",
+      "type": "checkbox",
+      "id": "Field_RequiresMedication",
+      "key": "requiresMedication",
+      "layout": {
+        "row": "Row_18"
+      }
+    },
+    {
+      "label": "Название и дозировка лекарств",
+      "type": "textarea",
+      "id": "Field_MedicationDetails",
+      "key": "medicationDetails",
+      "layout": {
+        "row": "Row_19"
+      },
+      "conditional": {
+        "hide": "=requiresMedication = false"
+      }
+    },
+    {
+      "text": "## Питание и уход",
+      "type": "text",
+      "id": "Field_FeedingHeader",
+      "layout": {
+        "row": "Row_20"
+      }
+    },
+    {
+      "label": "График кормления",
+      "type": "select",
+      "id": "Field_FeedingSchedule",
+      "key": "feedingSchedule",
+      "layout": {
+        "row": "Row_21"
+      },
+      "validate": {
+        "required": true
+      },
+      "values": [
+        {
+          "label": "1 раз в день",
+          "value": "once"
+        },
+        {
+          "label": "2 раза в день",
+          "value": "twice"
+        },
+        {
+          "label": "3 раза в день",
+          "value": "thrice"
+        }
+      ]
+    },
+    {
+      "label": "Тип корма",
+      "type": "select",
+      "id": "Field_FoodType",
+      "key": "foodType",
+      "layout": {
+        "row": "Row_22"
+      },
+      "validate": {
+        "required": true
+      },
+      "values": [
+        {
+          "label": "Собственный корм владельца",
+          "value": "own"
+        },
+        {
+          "label": "Корм отеля",
+          "value": "hotel"
+        }
+      ]
+    },
+    {
+      "label": "Особенности питания",
+      "type": "textarea",
+      "id": "Field_DietaryNotes",
+      "key": "dietaryNotes",
+      "layout": {
+        "row": "Row_23"
+      }
+    },
+    {
+      "text": "## Даты пребывания",
+      "type": "text",
+      "id": "Field_DatesHeader",
+      "layout": {
+        "row": "Row_24"
+      }
+    },
+    {
+      "label": "Дата заезда",
+      "type": "datetime",
+      "subtype": "date",
+      "id": "Field_CheckInDate",
+      "key": "checkInDate",
+      "dateLabel": "Дата заезда",
+      "layout": {
+        "row": "Row_25"
+      },
+      "validate": {
+        "required": true
+      }
+    },
+    {
+      "label": "Дата выезда",
+      "type": "datetime",
+      "subtype": "date",
+      "id": "Field_CheckOutDate",
+      "key": "checkOutDate",
+      "dateLabel": "Дата выезда",
+      "layout": {
+        "row": "Row_26"
+      },
+      "validate": {
+        "required": true
+      }
+    },
+    {
+      "label": "Особые пожелания",
+      "type": "textarea",
+      "id": "Field_SpecialRequests",
+      "key": "specialRequests",
+      "layout": {
+        "row": "Row_27"
+      }
+    }
+  ],
+  "type": "default",
+  "id": "BookingForm",
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.5.0"
+}

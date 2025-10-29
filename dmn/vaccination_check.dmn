@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" 
+  xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" 
+  xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" 
+  xmlns:modeler="http://camunda.org/schema/modeler/1.0" 
+  id="Definitions_VaccinationCheck" 
+  name="Vaccination Check Decision" 
+  namespace="http://camunda.org/schema/1.0/dmn" 
+  exporter="Camunda Modeler" 
+  exporterVersion="5.36.1" 
+  modeler:executionPlatform="Camunda Cloud" 
+  modeler:executionPlatformVersion="8.5.0">
+  
+  <decision id="vaccination_check" name="Проверка актуальности вакцинации">
+    <decisionTable id="DecisionTable_VaccinationCheck" hitPolicy="FIRST">
+      
+      <!-- Input 1: Дата последней вакцинации -->
+      <input id="Input_VaccinationDate" label="Дата последней вакцинации">
+        <inputExpression id="InputExpression_VaccinationDate" typeRef="string">
+          <text>lastVaccinationDate</text>
+        </inputExpression>
+      </input>
+      
+      <!-- Input 2: Тип питомца -->
+      <input id="Input_PetType" label="Вид питомца">
+        <inputExpression id="InputExpression_PetType" typeRef="string">
+          <text>petType</text>
+        </inputExpression>
+        <inputValues id="InputValues_PetType">
+          <text>"dog","cat"</text>
+        </inputValues>
+      </input>
+      
+      <!-- Output 1: Статус вакцинации -->
+      <output id="Output_VaccinationStatus" 
+              label="Статус вакцинации" 
+              name="vaccinationStatus" 
+              typeRef="string">
+        <outputValues id="OutputValues_VaccinationStatus">
+          <text>"Актуальна","Истекает","Просрочена"</text>
+        </outputValues>
+      </output>
+      
+      <!-- Output 2: Решение -->
+      <output id="Output_Decision" 
+              label="Решение" 
+              name="bookingDecision" 
+              typeRef="string">
+        <outputValues id="OutputValues_Decision">
+          <text>"Одобрено","Одобрено с условием","Отклонено"</text>
+        </outputValues>
+      </output>
+      
+      <!-- Output 3: Сообщение -->
+      <output id="Output_Message" 
+              label="Сообщение" 
+              name="vaccinationMessage" 
+              typeRef="string" />
+      
+      <!-- Rule 1: Собака - вакцинация актуальна (менее 12 месяцев) -->
+      <rule id="Rule_Dog_Valid">
+        <description>Собака с актуальной вакцинацией</description>
+        <inputEntry id="InputEntry_1_1">
+          <text>date and time(lastVaccinationDate) &gt; date and time(today()) - duration("P12M")</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_1_2">
+          <text>"dog"</text>
+        </inputEntry>
+        <outputEntry id="OutputEntry_1_1">
+          <text>"Актуальна"</text>
+        </outputEntry>
+        <outputEntry id="OutputEntry_1_2">
+          <text>"Одобрено"</text>
+        </outputEntry>
+        <outputEntry id="OutputEntry_1_3">
+          <text>"Вакцинация актуальна. Бронирование одобрено."</text>
+        </outputEntry>
+      </rule>
+      
+      <!-- Rule 2: Собака - вакцинация истекает (11-12 месяцев) -->
+      <rule id="Rule_Dog_Expiring">
+        <description>Собака - вакцинация скоро истекает</description>
+        <inputEntry id="InputEntry_2_1">
+          <text>date and time(lastVaccinationDate) &lt;= date and time(today()) - duration("P11M") and date and time(lastVaccinationDate) &gt; date and time(today()) - duration("P12M")</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_2_2">
+          <text>"dog"</text>
+        </inputEntry>
+        <outputEntry id="OutputEntry_2_1">
+          <text>"Истекает"</text>
+        </outputEntry>
+        <outputEntry id="OutputEntry_2_2">
+          <text>"Одобрено с условием"</text>
+        </outputEntry>
+        <outputEntry id="OutputEntry_2_3">
+          <text>"Вакцинация скоро истекает. Рекомендуем обновить перед следующим визитом."</text>
+        </outputEntry>
+      </rule>
+      
+      <!-- Rule 3: Собака - вакцинация просрочена -->
+      <rule id="Rule_Dog_Expired">
+        <description>Собака с просроченной вакцинацией</description>
+        <inputEntry id="InputEntry_3_1">
+          <text>date and time(lastVaccinationDate) &lt;= date and time(today()) - duration("P12M")</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_3_2">
+          <text>"dog"</text>
+        </inputEntry>
+        <outputEntry id="OutputEntry_3_1">
+          <text>"Просрочена"</text>
+        </outputEntry>
+        <outputEntry id="OutputEntry_3_2">
+          <text>"Отклонено"</text>
+        </outputEntry>
+        <outputEntry id="OutputEntry_3_3">
+          <text>"Вакцинация просрочена более 12 месяцев. Бронирование отклонено."</text>
+        </outputEntry>
+      </rule>
+      
+      <!-- Rule 4: Кошка - вакцинация актуальна (менее 12 месяцев) -->
+      <rule id="Rule_Cat_Valid">
+        <description>Кошка с актуальной вакцинацией</description>
+        <inputEntry id="InputEntry_4_1">
+          <text>date and time(lastVaccinationDate) &gt; date and time(today()) - duration("P12M")</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_4_2">
+          <text>"cat"</text>
+        </inputEntry>
+        <outputEntry id="OutputEntry_4_1">
+          <text>"Актуальна"</text>
+        </outputEntry>
+        <outputEntry id="OutputEntry_4_2">
+          <text>"Одобрено"</text>
+        </outputEntry>
+        <outputEntry id="OutputEntry_4_3">
+          <text>"Вакцинация актуальна. Бронирование одобрено."</text>
+        </outputEntry>
+      </rule>
+      
+      <!-- Rule 5: Кошка - вакцинация истекает -->
+      <rule id="Rule_Cat_Expiring">
+        <description>Кошка - вакцинация скоро истекает</description>
+        <inputEntry id="InputEntry_5_1">
+          <text>date and time(lastVaccinationDate) &lt;= date and time(today()) - duration("P11M") and date and time(lastVaccinationDate) &gt; date and time(today()) - duration("P12M")</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_5_2">
+          <text>"cat"</text>
+        </inputEntry>
+        <outputEntry id="OutputEntry_5_1">
+          <text>"Истекает"</text>
+        </outputEntry>
+        <outputEntry id="OutputEntry_5_2">
+          <text>"Одобрено с условием"</text>
+        </outputEntry>
+        <outputEntry id="OutputEntry_5_3">
+          <text>"Вакцинация скоро истекает. Рекомендуем обновить перед следующим визитом."</text>
+        </outputEntry>
+      </rule>
+      
+      <!-- Rule 6: Кошка - вакцинация просрочена -->
+      <rule id="Rule_Cat_Expired">
+        <description>Кошка с просроченной вакцинацией</description>
+        <inputEntry id="InputEntry_6_1">
+          <text>date and time(lastVaccinationDate) &lt;= date and time(today()) - duration("P12M")</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_6_2">
+          <text>"cat"</text>
+        </inputEntry>
+        <outputEntry id="OutputEntry_6_1">
+          <text>"Просрочена"</text>
+        </outputEntry>
+        <outputEntry id="OutputEntry_6_2">
+          <text>"Отклонено"</text>
+        </outputEntry>
+        <outputEntry id="OutputEntry_6_3">
+          <text>"Вакцинация просрочена более 12 месяцев. Бронирование отклонено."</text>
+        </outputEntry>
+      </rule>
+      
+    </decisionTable>
+  </decision>
+  
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram>
+      <dmndi:DMNShape dmnElementRef="vaccination_check">
+        <dc:Bounds height="80" width="180" x="160" y="100" />
+      </dmndi:DMNShape>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+  
+</definitions>

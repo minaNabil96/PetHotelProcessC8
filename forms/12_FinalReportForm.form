@@ -1,0 +1,349 @@
+{
+  "schemaVersion": 13,
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.36.1"
+  },
+  "components": [
+    {
+      "text": "## Итоговый отчет о пребывании",
+      "type": "text",
+      "id": "Field_Header",
+      "layout": {
+        "row": "Row_0"
+      }
+    },
+    {
+      "label": "Питомец",
+      "type": "textfield",
+      "id": "Field_PetName",
+      "key": "petName",
+      "layout": {
+        "row": "Row_1"
+      },
+      "readonly": true
+    },
+    {
+      "label": "Владелец",
+      "type": "textfield",
+      "id": "Field_ClientName",
+      "key": "clientName",
+      "layout": {
+        "row": "Row_2"
+      },
+      "readonly": true
+    },
+    {
+      "label": "Период пребывания",
+      "type": "textfield",
+      "id": "Field_StayPeriod",
+      "key": "stayPeriod",
+      "layout": {
+        "row": "Row_3"
+      },
+      "defaultValue": "=checkInDate + \" - \" + checkOutDate",
+      "readonly": true
+    },
+    {
+      "label": "Общее количество дней",
+      "type": "number",
+      "id": "Field_TotalDays",
+      "key": "totalDays",
+      "layout": {
+        "row": "Row_4"
+      },
+      "readonly": true
+    },
+    {
+      "text": "### Поведение и адаптация",
+      "type": "text",
+      "id": "Field_BehaviorHeader",
+      "layout": {
+        "row": "Row_5"
+      }
+    },
+    {
+      "label": "Адаптация к отелю",
+      "type": "select",
+      "id": "Field_AdaptationLevel",
+      "key": "finalAdaptationLevel",
+      "layout": {
+        "row": "Row_6"
+      },
+      "values": [
+        {
+          "label": "Отлично адаптировался",
+          "value": "excellent"
+        },
+        {
+          "label": "Хорошо адаптировался",
+          "value": "good"
+        },
+        {
+          "label": "Удовлетворительно",
+          "value": "fair"
+        },
+        {
+          "label": "С трудом",
+          "value": "difficult"
+        }
+      ]
+    },
+    {
+      "label": "Общее поведение",
+      "type": "textarea",
+      "id": "Field_BehaviorSummary",
+      "key": "behaviorSummary",
+      "layout": {
+        "row": "Row_7"
+      },
+      "validate": {
+        "required": true
+      }
+    },
+    {
+      "label": "Социализация с другими животными",
+      "type": "select",
+      "id": "Field_SocializationSuccess",
+      "key": "socializationSuccess",
+      "layout": {
+        "row": "Row_8"
+      },
+      "values": [
+        {
+          "label": "Отлично ладил",
+          "value": "excellent"
+        },
+        {
+          "label": "Хорошо ладил",
+          "value": "good"
+        },
+        {
+          "label": "Предпочитал одиночество",
+          "value": "preferredAlone"
+        },
+        {
+          "label": "Были конфликты",
+          "value": "conflicts"
+        }
+      ]
+    },
+    {
+      "text": "### Здоровье и уход",
+      "type": "text",
+      "id": "Field_HealthHeader",
+      "layout": {
+        "row": "Row_9"
+      }
+    },
+    {
+      "label": "Состояние здоровья в целом",
+      "type": "select",
+      "id": "Field_OverallHealthStatus",
+      "key": "overallHealthStatus",
+      "layout": {
+        "row": "Row_10"
+      },
+      "validate": {
+        "required": true
+      },
+      "values": [
+        {
+          "label": "Отличное",
+          "value": "excellent"
+        },
+        {
+          "label": "Хорошее",
+          "value": "good"
+        },
+        {
+          "label": "Удовлетворительное",
+          "value": "fair"
+        },
+        {
+          "label": "Были проблемы",
+          "value": "hadIssues"
+        }
+      ]
+    },
+    {
+      "label": "Аппетит во время пребывания",
+      "type": "select",
+      "id": "Field_AppetiteSummary",
+      "key": "appetiteSummary",
+      "layout": {
+        "row": "Row_11"
+      },
+      "values": [
+        {
+          "label": "Стабильно хороший",
+          "value": "consistentlyGood"
+        },
+        {
+          "label": "Нормальный",
+          "value": "normal"
+        },
+        {
+          "label": "Переменный",
+          "value": "variable"
+        },
+        {
+          "label": "Пониженный",
+          "value": "reduced"
+        }
+      ]
+    },
+    {
+      "label": "Медицинские наблюдения",
+      "type": "textarea",
+      "id": "Field_MedicalObservations",
+      "key": "medicalObservations",
+      "layout": {
+        "row": "Row_12"
+      }
+    },
+    {
+      "label": "Были ли визиты ветеринара?",
+      "type": "checkbox",
+      "id": "Field_VetVisits",
+      "key": "hadVetVisits",
+      "layout": {
+        "row": "Row_13"
+      }
+    },
+    {
+      "label": "Детали ветеринарных визитов",
+      "type": "textarea",
+      "id": "Field_VetVisitDetails",
+      "key": "vetVisitDetails",
+      "layout": {
+        "row": "Row_14"
+      },
+      "conditional": {
+        "hide": "=hadVetVisits = false"
+      }
+    },
+    {
+      "text": "### Активности",
+      "type": "text",
+      "id": "Field_ActivitiesHeader",
+      "layout": {
+        "row": "Row_15"
+      }
+    },
+    {
+      "label": "Любимые активности",
+      "type": "textarea",
+      "id": "Field_FavoriteActivities",
+      "key": "favoriteActivities",
+      "layout": {
+        "row": "Row_16"
+      }
+    },
+    {
+      "label": "Уровень активности",
+      "type": "select",
+      "id": "Field_ActivityLevelSummary",
+      "key": "activityLevelSummary",
+      "layout": {
+        "row": "Row_17"
+      },
+      "values": [
+        {
+          "label": "Очень активный",
+          "value": "veryActive"
+        },
+        {
+          "label": "Активный",
+          "value": "active"
+        },
+        {
+          "label": "Умеренно активный",
+          "value": "moderate"
+        },
+        {
+          "label": "Спокойный",
+          "value": "calm"
+        }
+      ]
+    },
+    {
+      "text": "### Рекомендации",
+      "type": "text",
+      "id": "Field_RecommendationsHeader",
+      "layout": {
+        "row": "Row_18"
+      }
+    },
+    {
+      "label": "Рекомендации для будущих визитов",
+      "type": "textarea",
+      "id": "Field_FutureRecommendations",
+      "key": "futureRecommendations",
+      "layout": {
+        "row": "Row_19"
+      }
+    },
+    {
+      "label": "Рекомендации по уходу дома",
+      "type": "textarea",
+      "id": "Field_HomeCareAdvice",
+      "key": "homeCareAdvice",
+      "layout": {
+        "row": "Row_20"
+      }
+    },
+    {
+      "label": "Общая оценка пребывания",
+      "type": "select",
+      "id": "Field_OverallStayRating",
+      "key": "overallStayRating",
+      "layout": {
+        "row": "Row_21"
+      },
+      "values": [
+        {
+          "label": "Отлично",
+          "value": "5"
+        },
+        {
+          "label": "Хорошо",
+          "value": "4"
+        },
+        {
+          "label": "Удовлетворительно",
+          "value": "3"
+        },
+        {
+          "label": "Ниже ожидаемого",
+          "value": "2"
+        }
+      ]
+    },
+    {
+      "label": "Дополнительные комментарии",
+      "type": "textarea",
+      "id": "Field_AdditionalComments",
+      "key": "additionalComments",
+      "layout": {
+        "row": "Row_22"
+      }
+    },
+    {
+      "label": "Отчет подготовил",
+      "type": "textfield",
+      "id": "Field_ReportPreparedBy",
+      "key": "reportPreparedBy",
+      "layout": {
+        "row": "Row_23"
+      },
+      "validate": {
+        "required": true
+      }
+    }
+  ],
+  "type": "default",
+  "id": "FinalReportForm",
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.5.0"
+}

@@ -1,0 +1,219 @@
+{
+  "schemaVersion": 13,
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.36.1"
+  },
+  "components": [
+    {
+      "text": "## Игровая активность",
+      "type": "text",
+      "id": "Field_Header",
+      "layout": {
+        "row": "Row_0"
+      }
+    },
+    {
+      "label": "Питомец",
+      "type": "textfield",
+      "id": "Field_PetName",
+      "key": "petName",
+      "layout": {
+        "row": "Row_1"
+      },
+      "readonly": true
+    },
+    {
+      "label": "Время начала",
+      "type": "datetime",
+      "id": "Field_ActivityStartTime",
+      "key": "activityStartTime",
+      "dateLabel": "Дата",
+      "timeLabel": "Время",
+      "layout": {
+        "row": "Row_2"
+      },
+      "defaultValue": "=now()"
+    },
+    {
+      "label": "Тип активности",
+      "type": "select",
+      "id": "Field_ActivityType",
+      "key": "activityType",
+      "layout": {
+        "row": "Row_3"
+      },
+      "validate": {
+        "required": true
+      },
+      "values": [
+        {
+          "label": "Групповые игры",
+          "value": "groupPlay"
+        },
+        {
+          "label": "Индивидуальные игры",
+          "value": "individualPlay"
+        },
+        {
+          "label": "Тренировка",
+          "value": "training"
+        },
+        {
+          "label": "Ласка и общение",
+          "value": "petting"
+        }
+      ]
+    },
+    {
+      "label": "Продолжительность (минут)",
+      "type": "number",
+      "id": "Field_ActivityDuration",
+      "key": "activityDuration",
+      "layout": {
+        "row": "Row_4"
+      },
+      "validate": {
+        "required": true,
+        "min": 5,
+        "max": 120
+      }
+    },
+    {
+      "label": "Другие участники (для групповых игр)",
+      "type": "textarea",
+      "id": "Field_OtherParticipants",
+      "key": "otherParticipants",
+      "layout": {
+        "row": "Row_5"
+      }
+    },
+    {
+      "label": "Уровень вовлеченности",
+      "type": "select",
+      "id": "Field_EngagementLevel",
+      "key": "engagementLevel",
+      "layout": {
+        "row": "Row_6"
+      },
+      "values": [
+        {
+          "label": "Очень активно участвовал",
+          "value": "veryEngaged"
+        },
+        {
+          "label": "Активно участвовал",
+          "value": "engaged"
+        },
+        {
+          "label": "Умеренно участвовал",
+          "value": "moderatelyEngaged"
+        },
+        {
+          "label": "Слабо участвовал",
+          "value": "lowEngagement"
+        },
+        {
+          "label": "Не заинтересован",
+          "value": "notInterested"
+        }
+      ]
+    },
+    {
+      "label": "Поведение во время активности",
+      "type": "select",
+      "id": "Field_ActivityBehavior",
+      "key": "activityBehavior",
+      "layout": {
+        "row": "Row_7"
+      },
+      "values": [
+        {
+          "label": "Дружелюбное",
+          "value": "friendly"
+        },
+        {
+          "label": "Игривое",
+          "value": "playful"
+        },
+        {
+          "label": "Осторожное",
+          "value": "cautious"
+        },
+        {
+          "label": "Доминантное",
+          "value": "dominant"
+        },
+        {
+          "label": "Застенчивое",
+          "value": "shy"
+        },
+        {
+          "label": "Агрессивное",
+          "value": "aggressive"
+        }
+      ]
+    },
+    {
+      "label": "Инциденты во время игры?",
+      "type": "checkbox",
+      "id": "Field_IncidentsOccurred",
+      "key": "incidentsOccurred",
+      "layout": {
+        "row": "Row_8"
+      }
+    },
+    {
+      "label": "Описание инцидента",
+      "type": "textarea",
+      "id": "Field_IncidentDescription",
+      "key": "incidentDescription",
+      "layout": {
+        "row": "Row_9"
+      },
+      "conditional": {
+        "hide": "=incidentsOccurred = false"
+      }
+    },
+    {
+      "label": "Питомец устал после активности?",
+      "type": "select",
+      "id": "Field_FatigueLevel",
+      "key": "fatigueLevel",
+      "layout": {
+        "row": "Row_10"
+      },
+      "values": [
+        {
+          "label": "Да, нормально устал",
+          "value": "normallyTired"
+        },
+        {
+          "label": "Слегка устал",
+          "value": "slightlyTired"
+        },
+        {
+          "label": "Не устал",
+          "value": "notTired"
+        },
+        {
+          "label": "Очень истощен",
+          "value": "exhausted"
+        }
+      ]
+    },
+    {
+      "label": "Примечания об активности",
+      "type": "textarea",
+      "id": "Field_ActivityNotes",
+      "key": "activityNotes",
+      "layout": {
+        "row": "Row_11"
+      }
+    }
+  ],
+  "type": "default",
+  "id": "DailyActivityForm",
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.5.0"
+}

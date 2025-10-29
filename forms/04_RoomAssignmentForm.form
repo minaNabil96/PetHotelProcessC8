@@ -1,0 +1,173 @@
+{
+  "schemaVersion": 13,
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.36.1"
+  },
+  "components": [
+    {
+      "text": "## Размещение в номере",
+      "type": "text",
+      "id": "Field_Header",
+      "layout": {
+        "row": "Row_0"
+      }
+    },
+    {
+      "label": "Питомец",
+      "type": "textfield",
+      "id": "Field_PetName",
+      "key": "petName",
+      "layout": {
+        "row": "Row_1"
+      },
+      "readonly": true
+    },
+    {
+      "label": "Номер комнаты",
+      "type": "textfield",
+      "id": "Field_RoomNumber",
+      "key": "roomNumber",
+      "layout": {
+        "row": "Row_2"
+      },
+      "validate": {
+        "required": true
+      }
+    },
+    {
+      "label": "Тип номера",
+      "type": "select",
+      "id": "Field_RoomType",
+      "key": "roomType",
+      "layout": {
+        "row": "Row_3"
+      },
+      "validate": {
+        "required": true
+      },
+      "values": [
+        {
+          "label": "Стандарт (маленький)",
+          "value": "standard_small"
+        },
+        {
+          "label": "Стандарт (средний)",
+          "value": "standard_medium"
+        },
+        {
+          "label": "Стандарт (большой)",
+          "value": "standard_large"
+        },
+        {
+          "label": "Люкс",
+          "value": "deluxe"
+        },
+        {
+          "label": "VIP",
+          "value": "vip"
+        }
+      ]
+    },
+    {
+      "label": "Номер чистый и готов?",
+      "type": "checkbox",
+      "id": "Field_RoomClean",
+      "key": "roomCleanStatus",
+      "layout": {
+        "row": "Row_4"
+      },
+      "validate": {
+        "required": true
+      }
+    },
+    {
+      "label": "Подстилка свежая?",
+      "type": "checkbox",
+      "id": "Field_BeddingFresh",
+      "key": "beddingFresh",
+      "layout": {
+        "row": "Row_5"
+      }
+    },
+    {
+      "label": "Миски для воды/еды установлены?",
+      "type": "checkbox",
+      "id": "Field_BowlsReady",
+      "key": "bowlsReady",
+      "layout": {
+        "row": "Row_6"
+      }
+    },
+    {
+      "label": "Игрушки размещены?",
+      "type": "checkbox",
+      "id": "Field_ToysPlaced",
+      "key": "toysPlaced",
+      "layout": {
+        "row": "Row_7"
+      }
+    },
+    {
+      "label": "Температура в помещении (°C)",
+      "type": "number",
+      "id": "Field_RoomTemperature",
+      "key": "roomTemperature",
+      "layout": {
+        "row": "Row_8"
+      },
+      "validate": {
+        "min": 18,
+        "max": 26
+      }
+    },
+    {
+      "label": "Питомец адаптировался?",
+      "type": "select",
+      "id": "Field_AdaptationLevel",
+      "key": "adaptationLevel",
+      "layout": {
+        "row": "Row_9"
+      },
+      "values": [
+        {
+          "label": "Спокойно",
+          "value": "calm"
+        },
+        {
+          "label": "Немного встревожен",
+          "value": "slightlyAnxious"
+        },
+        {
+          "label": "Очень встревожен",
+          "value": "veryAnxious"
+        }
+      ]
+    },
+    {
+      "label": "Примечания о размещении",
+      "type": "textarea",
+      "id": "Field_RoomNotes",
+      "key": "roomNotes",
+      "layout": {
+        "row": "Row_10"
+      }
+    },
+    {
+      "label": "Время размещения",
+      "type": "datetime",
+      "id": "Field_RoomAssignmentTime",
+      "key": "roomAssignmentTime",
+      "dateLabel": "Дата",
+      "timeLabel": "Время",
+      "layout": {
+        "row": "Row_11"
+      },
+      "defaultValue": "=now()"
+    }
+  ],
+  "type": "default",
+  "id": "RoomAssignmentForm",
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.5.0"
+}

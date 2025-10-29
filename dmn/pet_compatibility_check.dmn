@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" 
+  xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" 
+  xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" 
+  xmlns:modeler="http://camunda.org/schema/modeler/1.0" 
+  id="Definitions_PetCompatibility" 
+  name="Pet Compatibility Decision" 
+  namespace="http://camunda.org/schema/1.0/dmn" 
+  exporter="Camunda Modeler" 
+  exporterVersion="5.36.1" 
+  modeler:executionPlatform="Camunda Cloud" 
+  modeler:executionPlatformVersion="8.5.0">
+  
+  <decision id="pet_compatibility_check" name="Оценка совместимости для групповых игр">
+    <decisionTable id="DecisionTable_PetCompatibility" hitPolicy="FIRST">
+      
+      <input id="Input_PetType" label="Вид питомца">
+        <inputExpression id="InputExpression_PetType" typeRef="string">
+          <text>petType</text>
+        </inputExpression>
+        <inputValues id="InputValues_PetType">
+          <text>"dog","cat"</text>
+        </inputValues>
+      </input>
+      
+      <input id="Input_Temperament" label="Темперамент">
+        <inputExpression id="InputExpression_Temperament" typeRef="string">
+          <text>temperament</text>
+        </inputExpression>
+        <inputValues id="InputValues_Temperament">
+          <text>"Спокойный","Активный","Агрессивный"</text>
+        </inputValues>
+      </input>
+      
+      <input id="Input_SocialLevel" label="Уровень социализации">
+        <inputExpression id="InputExpression_SocialLevel" typeRef="string">
+          <text>socialLevel</text>
+        </inputExpression>
+        <inputValues id="InputValues_SocialLevel">
+          <text>"Высокий","Средний","Низкий"</text>
+        </inputValues>
+      </input>
+      
+      <output id="Output_CompatibilityLevel" 
+              label="Уровень совместимости" 
+              name="уровеньСовместимости" 
+              typeRef="string">
+        <outputValues id="OutputValues_CompatibilityLevel">
+          <text>"Полная","Ограниченная","Несовместим"</text>
+        </outputValues>
+      </output>
+      
+      <output id="Output_Recommendation" 
+              label="Рекомендация" 
+              name="рекомендация" 
+              typeRef="string" />
+      
+      <!-- DOGS RULES -->
+      <rule id="Rule_Dog_Aggressive">
+        <description>Агрессивная собака - только индивидуальные игры</description>
+        <inputEntry id="InputEntry_1_1">
+          <text>"dog"</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_1_2">
+          <text>"Агрессивный"</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_1_3">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="OutputEntry_1_1">
+          <text>"Несовместим"</text>
+        </outputEntry>
+        <outputEntry id="OutputEntry_1_2">
+          <text>"Только индивидуальные игры, высокий риск конфликтов"</text>
+        </outputEntry>
+      </rule>
+      
+      <rule id="Rule_Dog_HighSocial">
+        <description>Собака с высокой социализацией</description>
+        <inputEntry id="InputEntry_2_1">
+          <text>"dog"</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_2_2">
+          <text>"Спокойный","Активный"</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_2_3">
+          <text>"Высокий"</text>
+        </inputEntry>
+        <outputEntry id="OutputEntry_2_1">
+          <text>"Полная"</text>
+        </outputEntry>
+        <outputEntry id="OutputEntry_2_2">
+          <text>"Отлично подходит для групповых игр с другими собаками"</text>
+        </outputEntry>
+      </rule>
+      
+      <rule id="Rule_Dog_Calm_Medium">
+        <description>Спокойная собака со средней социализацией</description>
+        <inputEntry id="InputEntry_3_1">
+          <text>"dog"</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_3_2">
+          <text>"Спокойный"</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_3_3">
+          <text>"Средний"</text>
+        </inputEntry>
+        <outputEntry id="OutputEntry_3_1">
+          <text>"Ограниченная"</text>
+        </outputEntry>
+        <outputEntry id="OutputEntry_3_2">
+          <text>"Группа из 2-3 спокойных собак под наблюдением"</text>
+        </outputEntry>
+      </rule>
+      
+      <rule id="Rule_Dog_Active_Medium">
+        <description>Активная собака со средней социализацией</description>
+        <inputEntry id="InputEntry_4_1">
+          <text>"dog"</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_4_2">
+          <text>"Активный"</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_4_3">
+          <text>"Средний"</text>
+        </inputEntry>
+        <outputEntry id="OutputEntry_4_1">
+          <text>"Ограниченная"</text>
+        </outputEntry>
+        <outputEntry id="OutputEntry_4_2">
+          <text>"Группа активных собак схожего размера под контролем"</text>
+        </outputEntry>
+      </rule>
+      
+      <rule id="Rule_Dog_LowSocial">
+        <description>Собака с низкой социализацией</description>
+        <inputEntry id="InputEntry_5_1">
+          <text>"dog"</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_5_2">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="InputEntry_5_3">
+          <text>"Низкий"</text>
+        </inputEntry>
+        <outputEntry id="OutputEntry_5_1">
+          <text>"Несовместим"</text>
+        </outputEntry>
+        <outputEntry id="OutputEntry_5_2">
+          <text>"Индивидуальные игры, постепенная социализация"</text>
+        </outputEntry>
+      </rule>
+      
+      <!-- CATS RULES -->
+      <rule id="Rule_Cat_Aggressive">
+        <description>Агрессивная кошка</description>
+        <inputEntry id="InputEntry_6_1">
+          <text>"cat"</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_6_2">
+          <text>"Агрессивный"</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_6_3">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="OutputEntry_6_1">
+          <text>"Несовместим"</text>
+        </outputEntry>
+        <outputEntry id="OutputEntry_6_2">
+          <text>"Только индивидуальное размещение, избегать контакта"</text>
+        </outputEntry>
+      </rule>
+      
+      <rule id="Rule_Cat_HighSocial">
+        <description>Кошка с высокой социализацией</description>
+        <inputEntry id="InputEntry_7_1">
+          <text>"cat"</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_7_2">
+          <text>"Спокойный","Активный"</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_7_3">
+          <text>"Высокий"</text>
+        </inputEntry>
+        <outputEntry id="OutputEntry_7_1">
+          <text>"Ограниченная"</text>
+        </outputEntry>
+        <outputEntry id="OutputEntry_7_2">
+          <text>"Можно с другими кошками в отдельной зоне, избегать собак"</text>
+        </outputEntry>
+      </rule>
+      
+      <rule id="Rule_Cat_MediumLowSocial">
+        <description>Кошка со средней/низкой социализацией</description>
+        <inputEntry id="InputEntry_8_1">
+          <text>"cat"</text>
+        </inputEntry>
+        <inputEntry id="InputEntry_8_2">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="InputEntry_8_3">
+          <text>"Средний","Низкий"</text>
+        </inputEntry>
+        <outputEntry id="OutputEntry_8_1">
+          <text>"Несовместим"</text>
+        </outputEntry>
+        <outputEntry id="OutputEntry_8_2">
+          <text>"Индивидуальное размещение, избегать других животных"</text>
+        </outputEntry>
+      </rule>
+      
+      <!-- DEFAULT RULE -->
+      <rule id="Rule_Default">
+        <description>Правило по умолчанию</description>
+        <inputEntry id="InputEntry_9_1">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="InputEntry_9_2">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="InputEntry_9_3">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="OutputEntry_9_1">
+          <text>"Несовместим"</text>
+        </outputEntry>
+        <outputEntry id="OutputEntry_9_2">
+          <text>"Требуется индивидуальная оценка специалиста"</text>
+        </outputEntry>
+      </rule>
+      
+    </decisionTable>
+  </decision>
+  
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram>
+      <dmndi:DMNShape dmnElementRef="pet_compatibility_check">
+        <dc:Bounds height="80" width="180" x="160" y="100" />
+      </dmndi:DMNShape>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+  
+</definitions>

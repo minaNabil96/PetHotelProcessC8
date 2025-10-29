@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 13,
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.36.1"
+  },
+  "components": [
+    {
+      "text": "## Подготовка к отъезду",
+      "type": "text",
+      "id": "Field_Header",
+      "layout": {
+        "row": "Row_0"
+      }
+    },
+    {
+      "label": "Питомец",
+      "type": "textfield",
+      "id": "Field_PetName",
+      "key": "petName",
+      "layout": {
+        "row": "Row_1"
+      },
+      "readonly": true
+    },
+    {
+      "label": "Дата выезда",
+      "type": "datetime",
+      "subtype": "date",
+      "id": "Field_DepartureDate",
+      "key": "checkOutDate",
+      "dateLabel": "Дата",
+      "layout": {
+        "row": "Row_2"
+      },
+      "readonly": true
+    },
+    {
+      "label": "Финальное купание проведено?",
+      "type": "checkbox",
+      "id": "Field_FinalBathDone",
+      "key": "finalBathDone",
+      "layout": {
+        "row": "Row_3"
+      }
+    },
+    {
+      "label": "Шерсть вычесана?",
+      "type": "checkbox",
+      "id": "Field_CoatBrushed",
+      "key": "coatBrushed",
+      "layout": {
+        "row": "Row_4"
+      }
+    },
+    {
+      "label": "Когти подстрижены?",
+      "type": "checkbox",
+      "id": "Field_NailsTrimmed",
+      "key": "nailsTrimmed",
+      "layout": {
+        "row": "Row_5"
+      }
+    },
+    {
+      "label": "Личные вещи собраны?",
+      "type": "checkbox",
+      "id": "Field_BelongingsPacked",
+      "key": "belongingsPacked",
+      "layout": {
+        "row": "Row_6"
+      },
+      "validate": {
+        "required": true
+      }
+    },
+    {
+      "label": "Список возвращаемых вещей",
+      "type": "textarea",
+      "id": "Field_ReturnedItemsList",
+      "key": "returnedItemsList",
+      "layout": {
+        "row": "Row_7"
+      }
+    },
+    {
+      "label": "Оставшийся корм упакован?",
+      "type": "checkbox",
+      "id": "Field_RemainingFoodPacked",
+      "key": "remainingFoodPacked",
+      "layout": {
+        "row": "Row_8"
+      }
+    },
+    {
+      "label": "Лекарства возвращены?",
+      "type": "checkbox",
+      "id": "Field_MedicationsReturned",
+      "key": "medicationsReturned",
+      "layout": {
+        "row": "Row_9"
+      }
+    },
+    {
+      "label": "Состояние питомца перед отъездом",
+      "type": "select",
+      "id": "Field_DepartureCondition",
+      "key": "departureCondition",
+      "layout": {
+        "row": "Row_10"
+      },
+      "validate": {
+        "required": true
+      },
+      "values": [
+        {
+          "label": "Отличное",
+          "value": "excellent"
+        },
+        {
+          "label": "Хорошее",
+          "value": "good"
+        },
+        {
+          "label": "Удовлетворительное",
+          "value": "fair"
+        }
+      ]
+    },
+    {
+      "label": "Примечания для владельца",
+      "type": "textarea",
+      "id": "Field_NotesForOwner",
+      "key": "notesForOwner",
+      "layout": {
+        "row": "Row_11"
+      }
+    },
+    {
+      "label": "Рекомендации по уходу дома",
+      "type": "textarea",
+      "id": "Field_HomeC areRecommendations",
+      "key": "homeCareRecommendations",
+      "layout": {
+        "row": "Row_12"
+      }
+    }
+  ],
+  "type": "default",
+  "id": "DepartureForm",
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.5.0"
+}

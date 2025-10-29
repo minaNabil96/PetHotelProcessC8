@@ -1,0 +1,265 @@
+{
+  "schemaVersion": 13,
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.36.1"
+  },
+  "components": [
+    {
+      "text": "## Мониторинг здоровья",
+      "type": "text",
+      "id": "Field_Header",
+      "layout": {
+        "row": "Row_0"
+      }
+    },
+    {
+      "label": "Питомец",
+      "type": "textfield",
+      "id": "Field_PetName",
+      "key": "petName",
+      "layout": {
+        "row": "Row_1"
+      },
+      "readonly": true
+    },
+    {
+      "label": "Дата и время осмотра",
+      "type": "datetime",
+      "id": "Field_CheckTime",
+      "key": "healthCheckTime",
+      "dateLabel": "Дата",
+      "timeLabel": "Время",
+      "layout": {
+        "row": "Row_2"
+      },
+      "defaultValue": "=now()"
+    },
+    {
+      "label": "Общее состояние",
+      "type": "select",
+      "id": "Field_OverallCondition",
+      "key": "overallCondition",
+      "layout": {
+        "row": "Row_3"
+      },
+      "validate": {
+        "required": true
+      },
+      "values": [
+        {
+          "label": "Отличное",
+          "value": "excellent"
+        },
+        {
+          "label": "Хорошее",
+          "value": "good"
+        },
+        {
+          "label": "Удовлетворительное",
+          "value": "fair"
+        },
+        {
+          "label": "Плохое",
+          "value": "poor"
+        }
+      ]
+    },
+    {
+      "label": "Уровень энергии",
+      "type": "select",
+      "id": "Field_EnergyLevel",
+      "key": "energyLevel",
+      "layout": {
+        "row": "Row_4"
+      },
+      "values": [
+        {
+          "label": "Очень активный",
+          "value": "veryActive"
+        },
+        {
+          "label": "Активный",
+          "value": "active"
+        },
+        {
+          "label": "Нормальный",
+          "value": "normal"
+        },
+        {
+          "label": "Вялый",
+          "value": "lethargic"
+        }
+      ]
+    },
+    {
+      "label": "Аппетит",
+      "type": "select",
+      "id": "Field_AppetiteStatus",
+      "key": "appetiteStatus",
+      "layout": {
+        "row": "Row_5"
+      },
+      "values": [
+        {
+          "label": "Отличный",
+          "value": "excellent"
+        },
+        {
+          "label": "Нормальный",
+          "value": "normal"
+        },
+        {
+          "label": "Пониженный",
+          "value": "reduced"
+        },
+        {
+          "label": "Отсутствует",
+          "value": "none"
+        }
+      ]
+    },
+    {
+      "label": "Настроение/поведение",
+      "type": "select",
+      "id": "Field_Mood",
+      "key": "mood",
+      "layout": {
+        "row": "Row_6"
+      },
+      "values": [
+        {
+          "label": "Радостное",
+          "value": "happy"
+        },
+        {
+          "label": "Спокойное",
+          "value": "calm"
+        },
+        {
+          "label": "Тревожное",
+          "value": "anxious"
+        },
+        {
+          "label": "Агрессивное",
+          "value": "aggressive"
+        },
+        {
+          "label": "Депрессивное",
+          "value": "depressed"
+        }
+      ]
+    },
+    {
+      "label": "Обнаружены отклонения?",
+      "type": "checkbox",
+      "id": "Field_AbnormalitiesFound",
+      "key": "abnormalitiesFound",
+      "layout": {
+        "row": "Row_7"
+      }
+    },
+    {
+      "label": "Описание отклонений",
+      "type": "textarea",
+      "id": "Field_AbnormalitiesDescription",
+      "key": "abnormalitiesDescription",
+      "layout": {
+        "row": "Row_8"
+      },
+      "conditional": {
+        "hide": "=abnormalitiesFound = false"
+      }
+    },
+    {
+      "label": "Тревожные симптомы",
+      "type": "checklist",
+      "id": "Field_AlarmingSymptoms",
+      "key": "alarmingSymptoms",
+      "layout": {
+        "row": "Row_9"
+      },
+      "values": [
+        {
+          "label": "Рвота",
+          "value": "vomiting"
+        },
+        {
+          "label": "Диарея",
+          "value": "diarrhea"
+        },
+        {
+          "label": "Кашель",
+          "value": "coughing"
+        },
+        {
+          "label": "Чихание",
+          "value": "sneezing"
+        },
+        {
+          "label": "Хромота",
+          "value": "limping"
+        },
+        {
+          "label": "Выделения из глаз/носа",
+          "value": "discharge"
+        }
+      ]
+    },
+    {
+      "label": "Требуется внимание ветеринара?",
+      "type": "select",
+      "id": "Field_VetAttentionRequired",
+      "key": "vetAttentionRequired",
+      "layout": {
+        "row": "Row_10"
+      },
+      "validate": {
+        "required": true
+      },
+      "values": [
+        {
+          "label": "Нет",
+          "value": "no"
+        },
+        {
+          "label": "Плановый осмотр",
+          "value": "routine"
+        },
+        {
+          "label": "Срочно",
+          "value": "urgent"
+        },
+        {
+          "label": "Экстренно",
+          "value": "emergency"
+        }
+      ]
+    },
+    {
+      "label": "Примечания",
+      "type": "textarea",
+      "id": "Field_HealthNotes",
+      "key": "healthNotes",
+      "layout": {
+        "row": "Row_11"
+      }
+    },
+    {
+      "label": "Имя проверяющего",
+      "type": "textfield",
+      "id": "Field_InspectorName",
+      "key": "inspectorName",
+      "layout": {
+        "row": "Row_12"
+      },
+      "validate": {
+        "required": true
+      }
+    }
+  ],
+  "type": "default",
+  "id": "HealthCheckForm",
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.5.0"
+}

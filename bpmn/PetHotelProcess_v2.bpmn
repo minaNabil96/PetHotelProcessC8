@@ -1,0 +1,524 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" 
+  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" 
+  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" 
+  xmlns:di="http://www.omg.org/spec/DD/20100524/DI" 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" 
+  xmlns:modeler="http://camunda.org/schema/modeler/1.0" 
+  id="Definitions_PetHotel" 
+  targetNamespace="http://bpmn.io/schema/bpmn" 
+  exporter="Camunda Modeler" 
+  exporterVersion="5.36.1" 
+  modeler:executionPlatform="Camunda Cloud" 
+  modeler:executionPlatformVersion="8.5.0">
+  
+  <bpmn:collaboration id="Collaboration_PetHotel">
+    <bpmn:participant id="Participant_PetHotel" name="Отель для домашних животных" processRef="PetHotelProcess_v2" />
+  </bpmn:collaboration>
+  
+  <bpmn:process id="PetHotelProcess_v2" name="Процесс работы отеля для питомцев (Полный)" isExecutable="true">
+    
+    <!-- ========== START EVENT ========== -->
+    <bpmn:startEvent id="StartEvent_BookingRequest" name="Получен запрос на бронь">
+      <bpmn:outgoing>Flow_To_RegisterBooking</bpmn:outgoing>
+    </bpmn:startEvent>
+    
+    <bpmn:sequenceFlow id="Flow_To_RegisterBooking" sourceRef="StartEvent_BookingRequest" targetRef="Task_RegisterBooking" />
+    
+    <!-- ========== TASK: REGISTER BOOKING ========== -->
+    <bpmn:userTask id="Task_RegisterBooking" name="Зарегистрировать бронь">
+      <bpmn:extensionElements>
+        <zeebe:formDefinition formId="BookingForm" />
+        <zeebe:assignmentDefinition candidateGroups="specialist-priem" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_To_RegisterBooking</bpmn:incoming>
+      <bpmn:outgoing>Flow_To_VaccinationCheck</bpmn:outgoing>
+    </bpmn:userTask>
+    
+    <bpmn:sequenceFlow id="Flow_To_VaccinationCheck" sourceRef="Task_RegisterBooking" targetRef="Task_CheckVaccination" />
+    
+    <!-- ========== DMN: VACCINATION CHECK ========== -->
+    <bpmn:businessRuleTask id="Task_CheckVaccination" name="Проверить вакцинацию">
+      <bpmn:extensionElements>
+        <zeebe:calledDecision decisionId="vaccination_check" resultVariable="vaccinationResult" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_To_VaccinationCheck</bpmn:incoming>
+      <bpmn:outgoing>Flow_To_VaccinationGateway</bpmn:outgoing>
+    </bpmn:businessRuleTask>
+    
+    <bpmn:sequenceFlow id="Flow_To_VaccinationGateway" sourceRef="Task_CheckVaccination" targetRef="Gateway_VaccinationDecision" />
+    
+    <!-- ========== GATEWAY: VACCINATION DECISION ========== -->
+    <bpmn:exclusiveGateway id="Gateway_VaccinationDecision" name="Вакцинация актуальна?">
+      <bpmn:incoming>Flow_To_VaccinationGateway</bpmn:incoming>
+      <bpmn:outgoing>Flow_VaccinationApproved</bpmn:outgoing>
+      <bpmn:outgoing>Flow_VaccinationRejected</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    
+    <bpmn:sequenceFlow id="Flow_VaccinationApproved" name="Одобрено" sourceRef="Gateway_VaccinationDecision" targetRef="Task_GenerateContract">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=vaccinationResult.bookingDecision != "Отклонено"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    
+    <bpmn:sequenceFlow id="Flow_VaccinationRejected" name="Отклонено" sourceRef="Gateway_VaccinationDecision" targetRef="EndEvent_BookingRejected">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=vaccinationResult.bookingDecision = "Отклонено"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    
+    <!-- ========== END: BOOKING REJECTED ========== -->
+    <bpmn:endEvent id="EndEvent_BookingRejected" name="Бронь отклонена">
+      <bpmn:incoming>Flow_VaccinationRejected</bpmn:incoming>
+    </bpmn:endEvent>
+    
+    <!-- ========== SERVICE TASK: GENERATE CONTRACT ========== -->
+    <bpmn:serviceTask id="Task_GenerateContract" name="Сгенерировать договор">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="generate-contract" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_VaccinationApproved</bpmn:incoming>
+      <bpmn:outgoing>Flow_To_CheckIn</bpmn:outgoing>
+    </bpmn:serviceTask>
+    
+    <bpmn:sequenceFlow id="Flow_To_CheckIn" sourceRef="Task_GenerateContract" targetRef="Task_CheckIn" />
+    
+    <!-- ========== TASK: CHECK IN ========== -->
+    <bpmn:userTask id="Task_CheckIn" name="Провести регистрацию заезда">
+      <bpmn:extensionElements>
+        <zeebe:formDefinition formId="CheckInForm" />
+        <zeebe:assignmentDefinition candidateGroups="specialist-priem" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_To_CheckIn</bpmn:incoming>
+      <bpmn:outgoing>Flow_To_ParallelGateway</bpmn:outgoing>
+    </bpmn:userTask>
+    
+    <bpmn:sequenceFlow id="Flow_To_ParallelGateway" sourceRef="Task_CheckIn" targetRef="Gateway_CheckInSplit" />
+    
+    <!-- ========== PARALLEL GATEWAY: SPLIT ========== -->
+    <bpmn:parallelGateway id="Gateway_CheckInSplit">
+      <bpmn:incoming>Flow_To_ParallelGateway</bpmn:incoming>
+      <bpmn:outgoing>Flow_To_VetCheck</bpmn:outgoing>
+      <bpmn:outgoing>Flow_To_AssignRoom</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    
+    <bpmn:sequenceFlow id="Flow_To_VetCheck" sourceRef="Gateway_CheckInSplit" targetRef="Task_VetCheck" />
+    <bpmn:sequenceFlow id="Flow_To_AssignRoom" sourceRef="Gateway_CheckInSplit" targetRef="Task_AssignRoom" />
+    
+    <!-- ========== TASK: VET CHECK ========== -->
+    <bpmn:userTask id="Task_VetCheck" name="Провести вет. осмотр">
+      <bpmn:extensionElements>
+        <zeebe:formDefinition formId="VetCheckForm" />
+        <zeebe:assignmentDefinition candidateGroups="veterinar" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_To_VetCheck</bpmn:incoming>
+      <bpmn:outgoing>Flow_From_VetCheck</bpmn:outgoing>
+    </bpmn:userTask>
+    
+    <bpmn:sequenceFlow id="Flow_From_VetCheck" sourceRef="Task_VetCheck" targetRef="Gateway_CheckInJoin" />
+    
+    <!-- ========== TASK: ASSIGN ROOM ========== -->
+    <bpmn:userTask id="Task_AssignRoom" name="Разместить питомца в номере">
+      <bpmn:extensionElements>
+        <zeebe:formDefinition formId="RoomAssignmentForm" />
+        <zeebe:assignmentDefinition candidateGroups="care-specialist" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_To_AssignRoom</bpmn:incoming>
+      <bpmn:outgoing>Flow_From_AssignRoom</bpmn:outgoing>
+    </bpmn:userTask>
+    
+    <bpmn:sequenceFlow id="Flow_From_AssignRoom" sourceRef="Task_AssignRoom" targetRef="Gateway_CheckInJoin" />
+    
+    <!-- ========== PARALLEL GATEWAY: JOIN ========== -->
+    <bpmn:parallelGateway id="Gateway_CheckInJoin">
+      <bpmn:incoming>Flow_From_VetCheck</bpmn:incoming>
+      <bpmn:incoming>Flow_From_AssignRoom</bpmn:incoming>
+      <bpmn:outgoing>Flow_To_DailyCare</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    
+    <bpmn:sequenceFlow id="Flow_To_DailyCare" sourceRef="Gateway_CheckInJoin" targetRef="SubProcess_DailyCare" />
+    
+    <!-- ========== SUBPROCESS: DAILY CARE ========== -->
+    <bpmn:subProcess id="SubProcess_DailyCare" name="Ежедневный уход">
+      <bpmn:incoming>Flow_To_DailyCare</bpmn:incoming>
+      <bpmn:outgoing>Flow_To_PrepareForDeparture</bpmn:outgoing>
+      
+      <!-- START -->
+      <bpmn:startEvent id="Start_DailyCare">
+        <bpmn:outgoing>Flow_Daily_To_Feeding</bpmn:outgoing>
+      </bpmn:startEvent>
+      
+      <bpmn:sequenceFlow id="Flow_Daily_To_Feeding" sourceRef="Start_DailyCare" targetRef="Task_DailyFeeding" />
+      
+      <!-- FEEDING -->
+      <bpmn:userTask id="Task_DailyFeeding" name="Кормление">
+        <bpmn:extensionElements>
+          <zeebe:formDefinition formId="FeedingForm" />
+          <zeebe:assignmentDefinition candidateGroups="care-specialist" />
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_Daily_To_Feeding</bpmn:incoming>
+        <bpmn:outgoing>Flow_Daily_To_Walk</bpmn:outgoing>
+      </bpmn:userTask>
+      
+      <bpmn:sequenceFlow id="Flow_Daily_To_Walk" sourceRef="Task_DailyFeeding" targetRef="Task_DailyWalk" />
+      
+      <!-- WALK -->
+      <bpmn:userTask id="Task_DailyWalk" name="Прогулка">
+        <bpmn:extensionElements>
+          <zeebe:formDefinition formId="WalkForm" />
+          <zeebe:assignmentDefinition candidateGroups="care-specialist" />
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_Daily_To_Walk</bpmn:incoming>
+        <bpmn:outgoing>Flow_Daily_To_HealthCheck</bpmn:outgoing>
+      </bpmn:userTask>
+      
+      <bpmn:sequenceFlow id="Flow_Daily_To_HealthCheck" sourceRef="Task_DailyWalk" targetRef="Task_HealthMonitoring" />
+      
+      <!-- HEALTH MONITORING -->
+      <bpmn:userTask id="Task_HealthMonitoring" name="Мониторинг здоровья">
+        <bpmn:extensionElements>
+          <zeebe:formDefinition formId="HealthCheckForm" />
+          <zeebe:assignmentDefinition candidateGroups="care-specialist" />
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_Daily_To_HealthCheck</bpmn:incoming>
+        <bpmn:outgoing>Flow_Daily_To_MedicationGateway</bpmn:outgoing>
+      </bpmn:userTask>
+      
+      <bpmn:sequenceFlow id="Flow_Daily_To_MedicationGateway" sourceRef="Task_HealthMonitoring" targetRef="Gateway_MedicationNeeded" />
+      
+      <!-- MEDICATION GATEWAY -->
+      <bpmn:exclusiveGateway id="Gateway_MedicationNeeded" name="Требуются лекарства?">
+        <bpmn:incoming>Flow_Daily_To_MedicationGateway</bpmn:incoming>
+        <bpmn:outgoing>Flow_Daily_ToMedication</bpmn:outgoing>
+        <bpmn:outgoing>Flow_Daily_SkipMedication</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      
+      <bpmn:sequenceFlow id="Flow_Daily_ToMedication" name="Да" sourceRef="Gateway_MedicationNeeded" targetRef="Task_Medication">
+        <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=requiresMedication = true</bpmn:conditionExpression>
+      </bpmn:sequenceFlow>
+      
+      <bpmn:sequenceFlow id="Flow_Daily_SkipMedication" name="Нет" sourceRef="Gateway_MedicationNeeded" targetRef="Gateway_MedicationJoin">
+        <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=requiresMedication = false</bpmn:conditionExpression>
+      </bpmn:sequenceFlow>
+      
+      <!-- MEDICATION TASK -->
+      <bpmn:userTask id="Task_Medication" name="Дать лекарства">
+        <bpmn:extensionElements>
+          <zeebe:formDefinition formId="MedicationForm" />
+          <zeebe:assignmentDefinition candidateGroups="care-specialist" />
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_Daily_ToMedication</bpmn:incoming>
+        <bpmn:outgoing>Flow_Daily_FromMedication</bpmn:outgoing>
+      </bpmn:userTask>
+      
+      <bpmn:sequenceFlow id="Flow_Daily_FromMedication" sourceRef="Task_Medication" targetRef="Gateway_MedicationJoin" />
+      
+      <!-- MEDICATION JOIN -->
+      <bpmn:exclusiveGateway id="Gateway_MedicationJoin">
+        <bpmn:incoming>Flow_Daily_SkipMedication</bpmn:incoming>
+        <bpmn:incoming>Flow_Daily_FromMedication</bpmn:incoming>
+        <bpmn:outgoing>Flow_Daily_To_CompatibilityCheck</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      
+      <bpmn:sequenceFlow id="Flow_Daily_To_CompatibilityCheck" sourceRef="Gateway_MedicationJoin" targetRef="Task_CompatibilityCheck" />
+      
+      <!-- DMN: COMPATIBILITY CHECK -->
+      <bpmn:businessRuleTask id="Task_CompatibilityCheck" name="Оценить совместимость">
+        <bpmn:extensionElements>
+          <zeebe:calledDecision decisionId="pet_compatibility_check" resultVariable="compatibilityResult" />
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_Daily_To_CompatibilityCheck</bpmn:incoming>
+        <bpmn:outgoing>Flow_Daily_To_PlayDecision</bpmn:outgoing>
+      </bpmn:businessRuleTask>
+      
+      <bpmn:sequenceFlow id="Flow_Daily_To_PlayDecision" sourceRef="Task_CompatibilityCheck" targetRef="Gateway_PlayDecision" />
+      
+      <!-- PLAY DECISION GATEWAY -->
+      <bpmn:exclusiveGateway id="Gateway_PlayDecision" name="Совместим?">
+        <bpmn:incoming>Flow_Daily_To_PlayDecision</bpmn:incoming>
+        <bpmn:outgoing>Flow_Daily_To_GroupPlay</bpmn:outgoing>
+        <bpmn:outgoing>Flow_Daily_To_IndividualPlay</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      
+      <bpmn:sequenceFlow id="Flow_Daily_To_GroupPlay" name="Да" sourceRef="Gateway_PlayDecision" targetRef="Task_GroupPlay">
+        <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=compatibilityResult.уровеньСовместимости != "Несовместим"</bpmn:conditionExpression>
+      </bpmn:sequenceFlow>
+      
+      <bpmn:sequenceFlow id="Flow_Daily_To_IndividualPlay" name="Нет" sourceRef="Gateway_PlayDecision" targetRef="Task_IndividualPlay">
+        <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=compatibilityResult.уровеньСовместимости = "Несовместим"</bpmn:conditionExpression>
+      </bpmn:sequenceFlow>
+      
+      <!-- GROUP PLAY -->
+      <bpmn:userTask id="Task_GroupPlay" name="Организовать групповые игры">
+        <bpmn:extensionElements>
+          <zeebe:formDefinition formId="DailyActivityForm" />
+          <zeebe:assignmentDefinition candidateGroups="care-specialist" />
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_Daily_To_GroupPlay</bpmn:incoming>
+        <bpmn:outgoing>Flow_Daily_From_GroupPlay</bpmn:outgoing>
+      </bpmn:userTask>
+      
+      <bpmn:sequenceFlow id="Flow_Daily_From_GroupPlay" sourceRef="Task_GroupPlay" targetRef="Gateway_PlayJoin" />
+      
+      <!-- INDIVIDUAL PLAY -->
+      <bpmn:userTask id="Task_IndividualPlay" name="Организовать индивидуальные игры">
+        <bpmn:extensionElements>
+          <zeebe:formDefinition formId="DailyActivityForm" />
+          <zeebe:assignmentDefinition candidateGroups="care-specialist" />
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_Daily_To_IndividualPlay</bpmn:incoming>
+        <bpmn:outgoing>Flow_Daily_From_IndividualPlay</bpmn:outgoing>
+      </bpmn:userTask>
+      
+      <bpmn:sequenceFlow id="Flow_Daily_From_IndividualPlay" sourceRef="Task_IndividualPlay" targetRef="Gateway_PlayJoin" />
+      
+      <!-- PLAY JOIN -->
+      <bpmn:exclusiveGateway id="Gateway_PlayJoin">
+        <bpmn:incoming>Flow_Daily_From_GroupPlay</bpmn:incoming>
+        <bpmn:incoming>Flow_Daily_From_IndividualPlay</bpmn:incoming>
+        <bpmn:outgoing>Flow_Daily_To_OwnerUpdate</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      
+      <bpmn:sequenceFlow id="Flow_Daily_To_OwnerUpdate" sourceRef="Gateway_PlayJoin" targetRef="Task_SendOwnerUpdate" />
+      
+      <!-- OWNER UPDATE -->
+      <bpmn:userTask id="Task_SendOwnerUpdate" name="Отправить отчет владельцу">
+        <bpmn:extensionElements>
+          <zeebe:formDefinition formId="OwnerUpdateForm" />
+          <zeebe:assignmentDefinition candidateGroups="care-specialist" />
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_Daily_To_OwnerUpdate</bpmn:incoming>
+        <bpmn:outgoing>Flow_Daily_To_Timer</bpmn:outgoing>
+      </bpmn:userTask>
+      
+      <bpmn:sequenceFlow id="Flow_Daily_To_Timer" sourceRef="Task_SendOwnerUpdate" targetRef="Event_DailyTimer" />
+      
+      <!-- TIMER: DAILY REPEAT -->
+      <bpmn:intermediateCatchEvent id="Event_DailyTimer" name="Ждать следующий день">
+        <bpmn:incoming>Flow_Daily_To_Timer</bpmn:incoming>
+        <bpmn:outgoing>Flow_Daily_To_ContinueGateway</bpmn:outgoing>
+        <bpmn:timerEventDefinition id="TimerEventDefinition_Daily">
+          <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT24H</bpmn:timeDuration>
+        </bpmn:timerEventDefinition>
+      </bpmn:intermediateCatchEvent>
+      
+      <bpmn:sequenceFlow id="Flow_Daily_To_ContinueGateway" sourceRef="Event_DailyTimer" targetRef="Gateway_ContinueOrEnd" />
+      
+      <!-- GATEWAY: CONTINUE OR END -->
+      <bpmn:exclusiveGateway id="Gateway_ContinueOrEnd" name="Продолжить уход?">
+        <bpmn:incoming>Flow_Daily_To_ContinueGateway</bpmn:incoming>
+        <bpmn:outgoing>Flow_Daily_Continue</bpmn:outgoing>
+        <bpmn:outgoing>Flow_Daily_ToEnd</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      
+      <bpmn:sequenceFlow id="Flow_Daily_Continue" name="Да" sourceRef="Gateway_ContinueOrEnd" targetRef="Task_DailyFeeding">
+        <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=today() &lt; date(checkOutDate)</bpmn:conditionExpression>
+      </bpmn:sequenceFlow>
+      
+      <bpmn:sequenceFlow id="Flow_Daily_ToEnd" name="Нет" sourceRef="Gateway_ContinueOrEnd" targetRef="End_DailyCare">
+        <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=today() >= date(checkOutDate)</bpmn:conditionExpression>
+      </bpmn:sequenceFlow>
+      
+      <!-- END DAILY CARE -->
+      <bpmn:endEvent id="End_DailyCare">
+        <bpmn:incoming>Flow_Daily_ToEnd</bpmn:incoming>
+      </bpmn:endEvent>
+      
+    </bpmn:subProcess>
+    
+    <!-- ========== BOUNDARY EVENT: EMERGENCY ========== -->
+    <bpmn:boundaryEvent id="Event_Emergency" name="Экстренная ситуация" attachedToRef="SubProcess_DailyCare">
+      <bpmn:outgoing>Flow_To_EmergencyProtocol</bpmn:outgoing>
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_Emergency" errorRef="Error_Emergency" />
+    </bpmn:boundaryEvent>
+    
+    <bpmn:sequenceFlow id="Flow_To_EmergencyProtocol" sourceRef="Event_Emergency" targetRef="SubProcess_EmergencyProtocol" />
+    
+    <!-- ========== SUBPROCESS: EMERGENCY PROTOCOL ========== -->
+    <bpmn:subProcess id="SubProcess_EmergencyProtocol" name="Протокол экстренной ситуации">
+      <bpmn:incoming>Flow_To_EmergencyProtocol</bpmn:incoming>
+      <bpmn:outgoing>Flow_From_EmergencyProtocol</bpmn:outgoing>
+      
+      <bpmn:startEvent id="Start_Emergency" name="ЧП">
+        <bpmn:outgoing>Flow_Emerg_To_Form</bpmn:outgoing>
+      </bpmn:startEvent>
+      
+      <bpmn:sequenceFlow id="Flow_Emerg_To_Form" sourceRef="Start_Emergency" targetRef="Task_EmergencyForm" />
+      
+      <bpmn:userTask id="Task_EmergencyForm" name="Зафиксировать ЧП">
+        <bpmn:extensionElements>
+          <zeebe:formDefinition formId="EmergencyForm" />
+          <zeebe:assignmentDefinition candidateGroups="care-specialist" />
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_Emerg_To_Form</bpmn:incoming>
+        <bpmn:outgoing>Flow_Emerg_To_Split</bpmn:outgoing>
+      </bpmn:userTask>
+      
+      <bpmn:sequenceFlow id="Flow_Emerg_To_Split" sourceRef="Task_EmergencyForm" targetRef="Gateway_EmergencySplit" />
+      
+      <bpmn:parallelGateway id="Gateway_EmergencySplit">
+        <bpmn:incoming>Flow_Emerg_To_Split</bpmn:incoming>
+        <bpmn:outgoing>Flow_Emerg_To_ContactVet</bpmn:outgoing>
+        <bpmn:outgoing>Flow_Emerg_To_ContactOwner</bpmn:outgoing>
+      </bpmn:parallelGateway>
+      
+      <bpmn:sequenceFlow id="Flow_Emerg_To_ContactVet" sourceRef="Gateway_EmergencySplit" targetRef="Task_ContactVet" />
+      <bpmn:sequenceFlow id="Flow_Emerg_To_ContactOwner" sourceRef="Gateway_EmergencySplit" targetRef="Task_ContactOwner" />
+      
+      <bpmn:serviceTask id="Task_ContactVet" name="Связаться с ветеринаром">
+        <bpmn:extensionElements>
+          <zeebe:taskDefinition type="contact-vet" />
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_Emerg_To_ContactVet</bpmn:incoming>
+        <bpmn:outgoing>Flow_Emerg_From_ContactVet</bpmn:outgoing>
+      </bpmn:serviceTask>
+      
+      <bpmn:sequenceFlow id="Flow_Emerg_From_ContactVet" sourceRef="Task_ContactVet" targetRef="Gateway_EmergencyJoin" />
+      
+      <bpmn:serviceTask id="Task_ContactOwner" name="Связаться с владельцем">
+        <bpmn:extensionElements>
+          <zeebe:taskDefinition type="contact-owner" />
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_Emerg_To_ContactOwner</bpmn:incoming>
+        <bpmn:outgoing>Flow_Emerg_From_ContactOwner</bpmn:outgoing>
+      </bpmn:serviceTask>
+      
+      <bpmn:sequenceFlow id="Flow_Emerg_From_ContactOwner" sourceRef="Task_ContactOwner" targetRef="Gateway_EmergencyJoin" />
+      
+      <bpmn:parallelGateway id="Gateway_EmergencyJoin">
+        <bpmn:incoming>Flow_Emerg_From_ContactVet</bpmn:incoming>
+        <bpmn:incoming>Flow_Emerg_From_ContactOwner</bpmn:incoming>
+        <bpmn:outgoing>Flow_Emerg_To_TransportGateway</bpmn:outgoing>
+      </bpmn:parallelGateway>
+      
+      <bpmn:sequenceFlow id="Flow_Emerg_To_TransportGateway" sourceRef="Gateway_EmergencyJoin" targetRef="Gateway_TransportNeeded" />
+      
+      <bpmn:exclusiveGateway id="Gateway_TransportNeeded" name="Транспортировка нужна?">
+        <bpmn:incoming>Flow_Emerg_To_TransportGateway</bpmn:incoming>
+        <bpmn:outgoing>Flow_Emerg_To_Transport</bpmn:outgoing>
+        <bpmn:outgoing>Flow_Emerg_Skip_Transport</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      
+      <bpmn:sequenceFlow id="Flow_Emerg_To_Transport" name="Да" sourceRef="Gateway_TransportNeeded" targetRef="Task_ArrangeTransport">
+        <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=transportationNeeded = "urgentYes" or transportationNeeded = "scheduledYes"</bpmn:conditionExpression>
+      </bpmn:sequenceFlow>
+      
+      <bpmn:sequenceFlow id="Flow_Emerg_Skip_Transport" name="Нет" sourceRef="Gateway_TransportNeeded" targetRef="End_Emergency">
+        <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=transportationNeeded = "no" or transportationNeeded = "monitoring"</bpmn:conditionExpression>
+      </bpmn:sequenceFlow>
+      
+      <bpmn:serviceTask id="Task_ArrangeTransport" name="Организовать транспортировку">
+        <bpmn:extensionElements>
+          <zeebe:taskDefinition type="arrange-transport" />
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_Emerg_To_Transport</bpmn:incoming>
+        <bpmn:outgoing>Flow_Emerg_From_Transport</bpmn:outgoing>
+      </bpmn:serviceTask>
+      
+      <bpmn:sequenceFlow id="Flow_Emerg_From_Transport" sourceRef="Task_ArrangeTransport" targetRef="End_Emergency" />
+      
+      <bpmn:endEvent id="End_Emergency" name="ЧП обработано">
+        <bpmn:incoming>Flow_Emerg_Skip_Transport</bpmn:incoming>
+        <bpmn:incoming>Flow_Emerg_From_Transport</bpmn:incoming>
+      </bpmn:endEvent>
+      
+    </bpmn:subProcess>
+    
+    <bpmn:sequenceFlow id="Flow_From_EmergencyProtocol" sourceRef="SubProcess_EmergencyProtocol" targetRef="Task_PrepareForDeparture" />
+    
+    <!-- ========== NORMAL FLOW CONTINUES ========== -->
+    <bpmn:sequenceFlow id="Flow_To_PrepareForDeparture" sourceRef="SubProcess_DailyCare" targetRef="Task_PrepareForDeparture" />
+    
+    <!-- ========== TASK: PREPARE FOR DEPARTURE ========== -->
+    <bpmn:userTask id="Task_PrepareForDeparture" name="Подготовить питомца к отъезду">
+      <bpmn:extensionElements>
+        <zeebe:formDefinition formId="DepartureForm" />
+        <zeebe:assignmentDefinition candidateGroups="care-specialist" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_To_PrepareForDeparture</bpmn:incoming>
+      <bpmn:incoming>Flow_From_EmergencyProtocol</bpmn:incoming>
+      <bpmn:outgoing>Flow_To_FinalReport</bpmn:outgoing>
+    </bpmn:userTask>
+    
+    <bpmn:sequenceFlow id="Flow_To_FinalReport" sourceRef="Task_PrepareForDeparture" targetRef="Task_CreateFinalReport" />
+    
+    <!-- ========== TASK: FINAL REPORT ========== -->
+    <bpmn:userTask id="Task_CreateFinalReport" name="Создать итоговый отчет">
+      <bpmn:extensionElements>
+        <zeebe:formDefinition formId="FinalReportForm" />
+        <zeebe:assignmentDefinition candidateGroups="care-specialist" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_To_FinalReport</bpmn:incoming>
+      <bpmn:outgoing>Flow_To_FinalCheckout</bpmn:outgoing>
+    </bpmn:userTask>
+    
+    <bpmn:sequenceFlow id="Flow_To_FinalCheckout" sourceRef="Task_CreateFinalReport" targetRef="Task_FinalCheckout" />
+    
+    <!-- ========== TASK: FINAL CHECKOUT ========== -->
+    <bpmn:userTask id="Task_FinalCheckout" name="Провести выписку и расчет">
+      <bpmn:extensionElements>
+        <zeebe:formDefinition formId="CheckoutForm" />
+        <zeebe:assignmentDefinition candidateGroups="specialist-priem" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_To_FinalCheckout</bpmn:incoming>
+      <bpmn:outgoing>Flow_To_Feedback</bpmn:outgoing>
+    </bpmn:userTask>
+    
+    <bpmn:sequenceFlow id="Flow_To_Feedback" sourceRef="Task_FinalCheckout" targetRef="Task_CollectFeedback" />
+    
+    <!-- ========== TASK: COLLECT FEEDBACK ========== -->
+    <bpmn:userTask id="Task_CollectFeedback" name="Собрать отзыв">
+      <bpmn:extensionElements>
+        <zeebe:formDefinition formId="FeedbackForm" />
+        <zeebe:assignmentDefinition candidateGroups="specialist-priem" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_To_Feedback</bpmn:incoming>
+      <bpmn:outgoing>Flow_To_PostStaySplit</bpmn:outgoing>
+    </bpmn:userTask>
+    
+    <bpmn:sequenceFlow id="Flow_To_PostStaySplit" sourceRef="Task_CollectFeedback" targetRef="Gateway_PostStaySplit" />
+    
+    <!-- ========== PARALLEL GATEWAY: POST STAY ========== -->
+    <bpmn:parallelGateway id="Gateway_PostStaySplit">
+      <bpmn:incoming>Flow_To_PostStaySplit</bpmn:incoming>
+      <bpmn:outgoing>Flow_To_PetLeft</bpmn:outgoing>
+      <bpmn:outgoing>Flow_To_CleanRoom</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    
+    <bpmn:sequenceFlow id="Flow_To_PetLeft" sourceRef="Gateway_PostStaySplit" targetRef="EndEvent_PetLeft" />
+    <bpmn:sequenceFlow id="Flow_To_CleanRoom" sourceRef="Gateway_PostStaySplit" targetRef="Task_CleanRoom" />
+    
+    <!-- ========== END EVENT: PET LEFT ========== -->
+    <bpmn:endEvent id="EndEvent_PetLeft" name="Питомец покинул отель">
+      <bpmn:incoming>Flow_To_PetLeft</bpmn:incoming>
+    </bpmn:endEvent>
+    
+    <!-- ========== TASK: CLEAN ROOM ========== -->
+    <bpmn:userTask id="Task_CleanRoom" name="Провести уборку и дезинфекцию номера">
+      <bpmn:extensionElements>
+        <zeebe:formDefinition formId="CleaningForm" />
+        <zeebe:assignmentDefinition candidateGroups="housekeeping" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_To_CleanRoom</bpmn:incoming>
+      <bpmn:outgoing>Flow_To_RoomReady</bpmn:outgoing>
+    </bpmn:userTask>
+    
+    <bpmn:sequenceFlow id="Flow_To_RoomReady" sourceRef="Task_CleanRoom" targetRef="EndEvent_RoomReady" />
+    
+    <!-- ========== END EVENT: ROOM READY ========== -->
+    <bpmn:endEvent id="EndEvent_RoomReady" name="Номер готов">
+      <bpmn:incoming>Flow_To_RoomReady</bpmn:incoming>
+    </bpmn:endEvent>
+    
+  </bpmn:process>
+  
+  <!-- ========== ERROR DEFINITION ========== -->
+  <bpmn:error id="Error_Emergency" name="EmergencyError" errorCode="EMERGENCY" />
+  
+  <!-- ========== BPMN DIAGRAM (Simplified) ========== -->
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_PetHotel">
+      <bpmndi:BPMNShape id="Participant_di" bpmnElement="Participant_PetHotel" isHorizontal="true">
+        <dc:Bounds x="160" y="80" width="2400" height="600" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+  
+</bpmn:definitions>

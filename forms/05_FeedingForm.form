@@ -1,0 +1,170 @@
+{
+  "schemaVersion": 13,
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.36.1"
+  },
+  "components": [
+    {
+      "text": "## Кормление",
+      "type": "text",
+      "id": "Field_Header",
+      "layout": {
+        "row": "Row_0"
+      }
+    },
+    {
+      "label": "Питомец",
+      "type": "textfield",
+      "id": "Field_PetName",
+      "key": "petName",
+      "layout": {
+        "row": "Row_1"
+      },
+      "readonly": true
+    },
+    {
+      "label": "Время кормления",
+      "type": "datetime",
+      "id": "Field_FeedingTime",
+      "key": "feedingTime",
+      "dateLabel": "Дата",
+      "timeLabel": "Время",
+      "layout": {
+        "row": "Row_2"
+      },
+      "defaultValue": "=now()"
+    },
+    {
+      "label": "Тип приема пищи",
+      "type": "select",
+      "id": "Field_MealType",
+      "key": "mealType",
+      "layout": {
+        "row": "Row_3"
+      },
+      "validate": {
+        "required": true
+      },
+      "values": [
+        {
+          "label": "Завтрак",
+          "value": "breakfast"
+        },
+        {
+          "label": "Обед",
+          "value": "lunch"
+        },
+        {
+          "label": "Ужин",
+          "value": "dinner"
+        }
+      ]
+    },
+    {
+      "label": "Количество корма (грамм)",
+      "type": "number",
+      "id": "Field_FoodAmount",
+      "key": "foodAmount",
+      "layout": {
+        "row": "Row_4"
+      },
+      "validate": {
+        "required": true,
+        "min": 0
+      }
+    },
+    {
+      "label": "Питомец съел весь корм?",
+      "type": "select",
+      "id": "Field_FoodConsumed",
+      "key": "foodConsumed",
+      "layout": {
+        "row": "Row_5"
+      },
+      "validate": {
+        "required": true
+      },
+      "values": [
+        {
+          "label": "Все",
+          "value": "all"
+        },
+        {
+          "label": "Большую часть (>75%)",
+          "value": "most"
+        },
+        {
+          "label": "Половину (50%)",
+          "value": "half"
+        },
+        {
+          "label": "Немного (<25%)",
+          "value": "little"
+        },
+        {
+          "label": "Не ел",
+          "value": "none"
+        }
+      ]
+    },
+    {
+      "label": "Вода доступна?",
+      "type": "checkbox",
+      "id": "Field_WaterAvailable",
+      "key": "waterAvailable",
+      "layout": {
+        "row": "Row_6"
+      }
+    },
+    {
+      "label": "Питомец пил воду?",
+      "type": "checkbox",
+      "id": "Field_DrankWater",
+      "key": "drankWater",
+      "layout": {
+        "row": "Row_7"
+      }
+    },
+    {
+      "label": "Аппетит",
+      "type": "select",
+      "id": "Field_Appetite",
+      "key": "appetite",
+      "layout": {
+        "row": "Row_8"
+      },
+      "values": [
+        {
+          "label": "Отличный",
+          "value": "excellent"
+        },
+        {
+          "label": "Нормальный",
+          "value": "normal"
+        },
+        {
+          "label": "Пониженный",
+          "value": "reduced"
+        },
+        {
+          "label": "Отсутствует",
+          "value": "none"
+        }
+      ]
+    },
+    {
+      "label": "Примечания о кормлении",
+      "type": "textarea",
+      "id": "Field_FeedingNotes",
+      "key": "feedingNotes",
+      "layout": {
+        "row": "Row_9"
+      }
+    }
+  ],
+  "type": "default",
+  "id": "FeedingForm",
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.5.0"
+}

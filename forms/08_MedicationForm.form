@@ -1,0 +1,156 @@
+{
+  "schemaVersion": 13,
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.36.1"
+  },
+  "components": [
+    {
+      "text": "## Прием лекарств",
+      "type": "text",
+      "id": "Field_Header",
+      "layout": {
+        "row": "Row_0"
+      }
+    },
+    {
+      "label": "Питомец",
+      "type": "textfield",
+      "id": "Field_PetName",
+      "key": "petName",
+      "layout": {
+        "row": "Row_1"
+      },
+      "readonly": true
+    },
+    {
+      "label": "Время приема",
+      "type": "datetime",
+      "id": "Field_MedicationTime",
+      "key": "medicationTime",
+      "dateLabel": "Дата",
+      "timeLabel": "Время",
+      "layout": {
+        "row": "Row_2"
+      },
+      "defaultValue": "=now()"
+    },
+    {
+      "label": "Название лекарства",
+      "type": "textfield",
+      "id": "Field_MedicationName",
+      "key": "medicationName",
+      "layout": {
+        "row": "Row_3"
+      },
+      "validate": {
+        "required": true
+      }
+    },
+    {
+      "label": "Дозировка",
+      "type": "textfield",
+      "id": "Field_Dosage",
+      "key": "dosage",
+      "layout": {
+        "row": "Row_4"
+      },
+      "validate": {
+        "required": true
+      }
+    },
+    {
+      "label": "Способ приема",
+      "type": "select",
+      "id": "Field_AdministrationMethod",
+      "key": "administrationMethod",
+      "layout": {
+        "row": "Row_5"
+      },
+      "values": [
+        {
+          "label": "Перорально (в пасть)",
+          "value": "oral"
+        },
+        {
+          "label": "С едой",
+          "value": "withFood"
+        },
+        {
+          "label": "Инъекция",
+          "value": "injection"
+        },
+        {
+          "label": "Наружно",
+          "value": "topical"
+        }
+      ]
+    },
+    {
+      "label": "Лекарство принято успешно?",
+      "type": "checkbox",
+      "id": "Field_MedicationGiven",
+      "key": "medicationGivenSuccessfully",
+      "layout": {
+        "row": "Row_6"
+      }
+    },
+    {
+      "label": "Сложности при приеме",
+      "type": "textarea",
+      "id": "Field_AdministrationDifficulties",
+      "key": "administrationDifficulties",
+      "layout": {
+        "row": "Row_7"
+      }
+    },
+    {
+      "label": "Реакция на лекарство",
+      "type": "select",
+      "id": "Field_Reaction",
+      "key": "medicationReaction",
+      "layout": {
+        "row": "Row_8"
+      },
+      "values": [
+        {
+          "label": "Нормальная",
+          "value": "normal"
+        },
+        {
+          "label": "Легкое беспокойство",
+          "value": "mildDiscomfort"
+        },
+        {
+          "label": "Негативная реакция",
+          "value": "adverseReaction"
+        }
+      ]
+    },
+    {
+      "label": "Примечания",
+      "type": "textarea",
+      "id": "Field_MedicationNotes",
+      "key": "medicationNotes",
+      "layout": {
+        "row": "Row_9"
+      }
+    },
+    {
+      "label": "Имя проводившего процедуру",
+      "type": "textfield",
+      "id": "Field_AdministratorName",
+      "key": "administratorName",
+      "layout": {
+        "row": "Row_10"
+      },
+      "validate": {
+        "required": true
+      }
+    }
+  ],
+  "type": "default",
+  "id": "MedicationForm",
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.5.0"
+}

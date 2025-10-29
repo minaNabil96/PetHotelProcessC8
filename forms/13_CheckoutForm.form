@@ -1,0 +1,275 @@
+{
+  "schemaVersion": 13,
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.36.1"
+  },
+  "components": [
+    {
+      "text": "## Выписка и расчет",
+      "type": "text",
+      "id": "Field_Header",
+      "layout": {
+        "row": "Row_0"
+      }
+    },
+    {
+      "label": "Питомец",
+      "type": "textfield",
+      "id": "Field_PetName",
+      "key": "petName",
+      "layout": {
+        "row": "Row_1"
+      },
+      "readonly": true
+    },
+    {
+      "label": "Владелец",
+      "type": "textfield",
+      "id": "Field_ClientName",
+      "key": "clientName",
+      "layout": {
+        "row": "Row_2"
+      },
+      "readonly": true
+    },
+    {
+      "label": "Дата выписки",
+      "type": "datetime",
+      "id": "Field_ActualCheckoutTime",
+      "key": "actualCheckoutTime",
+      "dateLabel": "Дата",
+      "timeLabel": "Время",
+      "layout": {
+        "row": "Row_3"
+      },
+      "defaultValue": "=now()"
+    },
+    {
+      "text": "### Расчет стоимости",
+      "type": "text",
+      "id": "Field_BillingHeader",
+      "layout": {
+        "row": "Row_4"
+      }
+    },
+    {
+      "label": "Количество дней проживания",
+      "type": "number",
+      "id": "Field_TotalDaysStayed",
+      "key": "totalDaysStayed",
+      "layout": {
+        "row": "Row_5"
+      },
+      "validate": {
+        "required": true,
+        "min": 1
+      }
+    },
+    {
+      "label": "Стоимость проживания (руб/день)",
+      "type": "number",
+      "id": "Field_DailyRate",
+      "key": "dailyRate",
+      "layout": {
+        "row": "Row_6"
+      },
+      "validate": {
+        "required": true
+      }
+    },
+    {
+      "label": "Стоимость проживания (итого)",
+      "type": "number",
+      "id": "Field_AccommodationTotal",
+      "key": "accommodationTotal",
+      "layout": {
+        "row": "Row_7"
+      },
+      "readonly": true,
+      "defaultValue": "=totalDaysStayed * dailyRate"
+    },
+    {
+      "label": "Дополнительные услуги",
+      "type": "textarea",
+      "id": "Field_AdditionalServicesUsed",
+      "key": "additionalServicesUsed",
+      "layout": {
+        "row": "Row_8"
+      }
+    },
+    {
+      "label": "Стоимость доп. услуг (руб)",
+      "type": "number",
+      "id": "Field_AdditionalServicesCost",
+      "key": "additionalServicesCost",
+      "layout": {
+        "row": "Row_9"
+      },
+      "defaultValue": "0"
+    },
+    {
+      "label": "Ветеринарные услуги (руб)",
+      "type": "number",
+      "id": "Field_VeterinaryCost",
+      "key": "veterinaryCost",
+      "layout": {
+        "row": "Row_10"
+      },
+      "defaultValue": "0"
+    },
+    {
+      "label": "Скидка (%)",
+      "type": "number",
+      "id": "Field_DiscountPercent",
+      "key": "discountPercent",
+      "layout": {
+        "row": "Row_11"
+      },
+      "defaultValue": "0",
+      "validate": {
+        "min": 0,
+        "max": 100
+      }
+    },
+    {
+      "label": "Общая стоимость (руб)",
+      "type": "number",
+      "id": "Field_TotalAmount",
+      "key": "totalAmount",
+      "layout": {
+        "row": "Row_12"
+      },
+      "readonly": true,
+      "defaultValue": "=(accommodationTotal + additionalServicesCost + veterinaryCost) * (1 - discountPercent/100)"
+    },
+    {
+      "text": "### Оплата",
+      "type": "text",
+      "id": "Field_PaymentHeader",
+      "layout": {
+        "row": "Row_13"
+      }
+    },
+    {
+      "label": "Способ оплаты",
+      "type": "select",
+      "id": "Field_PaymentMethod",
+      "key": "paymentMethod",
+      "layout": {
+        "row": "Row_14"
+      },
+      "validate": {
+        "required": true
+      },
+      "values": [
+        {
+          "label": "Наличные",
+          "value": "cash"
+        },
+        {
+          "label": "Банковская карта",
+          "value": "card"
+        },
+        {
+          "label": "Банковский перевод",
+          "value": "transfer"
+        },
+        {
+          "label": "Электронный кошелек",
+          "value": "ewallet"
+        }
+      ]
+    },
+    {
+      "label": "Оплата произведена?",
+      "type": "checkbox",
+      "id": "Field_PaymentReceived",
+      "key": "paymentReceived",
+      "layout": {
+        "row": "Row_15"
+      },
+      "validate": {
+        "required": true
+      }
+    },
+    {
+      "label": "Номер чека/транзакции",
+      "type": "textfield",
+      "id": "Field_ReceiptNumber",
+      "key": "receiptNumber",
+      "layout": {
+        "row": "Row_16"
+      }
+    },
+    {
+      "text": "### Выдача документов",
+      "type": "text",
+      "id": "Field_DocumentsHeader",
+      "layout": {
+        "row": "Row_17"
+      }
+    },
+    {
+      "label": "Итоговый отчет выдан?",
+      "type": "checkbox",
+      "id": "Field_FinalReportProvided",
+      "key": "finalReportProvided",
+      "layout": {
+        "row": "Row_18"
+      }
+    },
+    {
+      "label": "Чек выдан?",
+      "type": "checkbox",
+      "id": "Field_ReceiptProvided",
+      "key": "receiptProvided",
+      "layout": {
+        "row": "Row_19"
+      }
+    },
+    {
+      "label": "Рекомендации озвучены владельцу?",
+      "type": "checkbox",
+      "id": "Field_RecommendationsDiscussed",
+      "key": "recommendationsDiscussed",
+      "layout": {
+        "row": "Row_20"
+      }
+    },
+    {
+      "label": "Особые наблюдения для обсуждения",
+      "type": "textarea",
+      "id": "Field_SpecialObservationsToDiscuss",
+      "key": "specialObservationsToDiscuss",
+      "layout": {
+        "row": "Row_21"
+      }
+    },
+    {
+      "label": "Примечания о выписке",
+      "type": "textarea",
+      "id": "Field_CheckoutNotes",
+      "key": "checkoutNotes",
+      "layout": {
+        "row": "Row_22"
+      }
+    },
+    {
+      "label": "Обработал выписку",
+      "type": "textfield",
+      "id": "Field_CheckoutProcessedBy",
+      "key": "checkoutProcessedBy",
+      "layout": {
+        "row": "Row_23"
+      },
+      "validate": {
+        "required": true
+      }
+    }
+  ],
+  "type": "default",
+  "id": "CheckoutForm",
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.5.0"
+}

@@ -1,0 +1,283 @@
+{
+  "schemaVersion": 13,
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.36.1"
+  },
+  "components": [
+    {
+      "text": "## Уборка и дезинфекция номера",
+      "type": "text",
+      "id": "Field_Header",
+      "layout": {
+        "row": "Row_0"
+      }
+    },
+    {
+      "label": "Номер комнаты",
+      "type": "textfield",
+      "id": "Field_RoomNumber",
+      "key": "roomNumber",
+      "layout": {
+        "row": "Row_1"
+      },
+      "validate": {
+        "required": true
+      }
+    },
+    {
+      "label": "Предыдущий постоялец",
+      "type": "textfield",
+      "id": "Field_PreviousPet",
+      "key": "petName",
+      "layout": {
+        "row": "Row_2"
+      },
+      "readonly": true
+    },
+    {
+      "label": "Время начала уборки",
+      "type": "datetime",
+      "id": "Field_CleaningStartTime",
+      "key": "cleaningStartTime",
+      "dateLabel": "Дата",
+      "timeLabel": "Время начала",
+      "layout": {
+        "row": "Row_3"
+      },
+      "defaultValue": "=now()"
+    },
+    {
+      "text": "### Контрольный список уборки",
+      "type": "text",
+      "id": "Field_ChecklistHeader",
+      "layout": {
+        "row": "Row_4"
+      }
+    },
+    {
+      "label": "Старая подстилка удалена?",
+      "type": "checkbox",
+      "id": "Field_OldBeddingRemoved",
+      "key": "oldBeddingRemoved",
+      "layout": {
+        "row": "Row_5"
+      },
+      "validate": {
+        "required": true
+      }
+    },
+    {
+      "label": "Новая подстилка установлена?",
+      "type": "checkbox",
+      "id": "Field_NewBeddingInstalled",
+      "key": "newBeddingInstalled",
+      "layout": {
+        "row": "Row_6"
+      },
+      "validate": {
+        "required": true
+      }
+    },
+    {
+      "label": "Пол вымыт?",
+      "type": "checkbox",
+      "id": "Field_FloorCleaned",
+      "key": "floorCleaned",
+      "layout": {
+        "row": "Row_7"
+      }
+    },
+    {
+      "label": "Стены протерты?",
+      "type": "checkbox",
+      "id": "Field_WallsWiped",
+      "key": "wallsWiped",
+      "layout": {
+        "row": "Row_8"
+      }
+    },
+    {
+      "label": "Миски вымыты и продезинфицированы?",
+      "type": "checkbox",
+      "id": "Field_BowlsCleaned",
+      "key": "bowlsCleaned",
+      "layout": {
+        "row": "Row_9"
+      }
+    },
+    {
+      "label": "Игрушки продезинфицированы?",
+      "type": "checkbox",
+      "id": "Field_ToysDisinfected",
+      "key": "toysDisinfected",
+      "layout": {
+        "row": "Row_10"
+      }
+    },
+    {
+      "label": "Дезинфекция всех поверхностей проведена?",
+      "type": "checkbox",
+      "id": "Field_SurfacesDisinfected",
+      "key": "surfacesDisinfected",
+      "layout": {
+        "row": "Row_11"
+      },
+      "validate": {
+        "required": true
+      }
+    },
+    {
+      "label": "Используемое дезинфицирующее средство",
+      "type": "textfield",
+      "id": "Field_DisinfectantUsed",
+      "key": "disinfectantUsed",
+      "layout": {
+        "row": "Row_12"
+      },
+      "validate": {
+        "required": true
+      }
+    },
+    {
+      "label": "Проветривание проведено?",
+      "type": "checkbox",
+      "id": "Field_RoomAired",
+      "key": "roomAired",
+      "layout": {
+        "row": "Row_13"
+      }
+    },
+    {
+      "label": "Мусор вынесен?",
+      "type": "checkbox",
+      "id": "Field_TrashRemoved",
+      "key": "trashRemoved",
+      "layout": {
+        "row": "Row_14"
+      }
+    },
+    {
+      "text": "### Проверка состояния",
+      "type": "text",
+      "id": "Field_InspectionHeader",
+      "layout": {
+        "row": "Row_15"
+      }
+    },
+    {
+      "label": "Обнаружены повреждения?",
+      "type": "checkbox",
+      "id": "Field_DamageFound",
+      "key": "damageFound",
+      "layout": {
+        "row": "Row_16"
+      }
+    },
+    {
+      "label": "Описание повреждений",
+      "type": "textarea",
+      "id": "Field_DamageDescription",
+      "key": "damageDescription",
+      "layout": {
+        "row": "Row_17"
+      },
+      "conditional": {
+        "hide": "=damageFound = false"
+      }
+    },
+    {
+      "label": "Требуется ремонт?",
+      "type": "checkbox",
+      "id": "Field_RepairNeeded",
+      "key": "repairNeeded",
+      "layout": {
+        "row": "Row_18"
+      }
+    },
+    {
+      "label": "Запах полностью устранен?",
+      "type": "checkbox",
+      "id": "Field_OdorEliminated",
+      "key": "odorEliminated",
+      "layout": {
+        "row": "Row_19"
+      }
+    },
+    {
+      "label": "Время окончания уборки",
+      "type": "datetime",
+      "id": "Field_CleaningEndTime",
+      "key": "cleaningEndTime",
+      "dateLabel": "Дата",
+      "timeLabel": "Время окончания",
+      "layout": {
+        "row": "Row_20"
+      }
+    },
+    {
+      "label": "Номер готов к заселению?",
+      "type": "select",
+      "id": "Field_RoomReadyStatus",
+      "key": "roomReadyStatus",
+      "layout": {
+        "row": "Row_21"
+      },
+      "validate": {
+        "required": true
+      },
+      "values": [
+        {
+          "label": "Готов",
+          "value": "ready"
+        },
+        {
+          "label": "Готов с замечаниями",
+          "value": "readyWithNotes"
+        },
+        {
+          "label": "Требуется доработка",
+          "value": "needsWork"
+        },
+        {
+          "label": "Требуется ремонт",
+          "value": "needsRepair"
+        }
+      ]
+    },
+    {
+      "label": "Примечания об уборке",
+      "type": "textarea",
+      "id": "Field_CleaningNotes",
+      "key": "cleaningNotes",
+      "layout": {
+        "row": "Row_22"
+      }
+    },
+    {
+      "label": "Уборку провел",
+      "type": "textfield",
+      "id": "Field_CleanedBy",
+      "key": "cleanedBy",
+      "layout": {
+        "row": "Row_23"
+      },
+      "validate": {
+        "required": true
+      }
+    },
+    {
+      "label": "Проверку провел",
+      "type": "textfield",
+      "id": "Field_InspectedBy",
+      "key": "inspectedBy",
+      "layout": {
+        "row": "Row_24"
+      }
+    }
+  ],
+  "type": "default",
+  "id": "CleaningForm",
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.5.0"
+}

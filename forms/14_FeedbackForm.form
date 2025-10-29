@@ -1,0 +1,249 @@
+{
+  "schemaVersion": 13,
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.36.1"
+  },
+  "components": [
+    {
+      "text": "## Обратная связь от клиента",
+      "type": "text",
+      "id": "Field_Header",
+      "layout": {
+        "row": "Row_0"
+      }
+    },
+    {
+      "label": "Владелец",
+      "type": "textfield",
+      "id": "Field_ClientName",
+      "key": "clientName",
+      "layout": {
+        "row": "Row_1"
+      },
+      "readonly": true
+    },
+    {
+      "label": "Питомец",
+      "type": "textfield",
+      "id": "Field_PetName",
+      "key": "petName",
+      "layout": {
+        "row": "Row_2"
+      },
+      "readonly": true
+    },
+    {
+      "text": "### Оценка услуг",
+      "type": "text",
+      "id": "Field_RatingsHeader",
+      "layout": {
+        "row": "Row_3"
+      }
+    },
+    {
+      "label": "Общая оценка обслуживания (1-5)",
+      "type": "number",
+      "id": "Field_OverallRating",
+      "key": "overallRating",
+      "layout": {
+        "row": "Row_4"
+      },
+      "validate": {
+        "required": true,
+        "min": 1,
+        "max": 5
+      }
+    },
+    {
+      "label": "Качество ухода за питомцем (1-5)",
+      "type": "number",
+      "id": "Field_CareQualityRating",
+      "key": "careQualityRating",
+      "layout": {
+        "row": "Row_5"
+      },
+      "validate": {
+        "min": 1,
+        "max": 5
+      }
+    },
+    {
+      "label": "Чистота номера (1-5)",
+      "type": "number",
+      "id": "Field_CleanlinessRating",
+      "key": "cleanlinessRating",
+      "layout": {
+        "row": "Row_6"
+      },
+      "validate": {
+        "min": 1,
+        "max": 5
+      }
+    },
+    {
+      "label": "Качество коммуникации (1-5)",
+      "type": "number",
+      "id": "Field_CommunicationRating",
+      "key": "communicationRating",
+      "layout": {
+        "row": "Row_7"
+      },
+      "validate": {
+        "min": 1,
+        "max": 5
+      }
+    },
+    {
+      "label": "Профессионализм персонала (1-5)",
+      "type": "number",
+      "id": "Field_StaffProfessionalismRating",
+      "key": "staffProfessionalismRating",
+      "layout": {
+        "row": "Row_8"
+      },
+      "validate": {
+        "min": 1,
+        "max": 5
+      }
+    },
+    {
+      "label": "Соотношение цена/качество (1-5)",
+      "type": "number",
+      "id": "Field_ValueForMoneyRating",
+      "key": "valueForMoneyRating",
+      "layout": {
+        "row": "Row_9"
+      },
+      "validate": {
+        "min": 1,
+        "max": 5
+      }
+    },
+    {
+      "text": "### Отзыв",
+      "type": "text",
+      "id": "Field_FeedbackHeader",
+      "layout": {
+        "row": "Row_10"
+      }
+    },
+    {
+      "label": "Что вам понравилось больше всего?",
+      "type": "textarea",
+      "id": "Field_PositiveFeedback",
+      "key": "positiveFeedback",
+      "layout": {
+        "row": "Row_11"
+      }
+    },
+    {
+      "label": "Что можно улучшить?",
+      "type": "textarea",
+      "id": "Field_ImprovementSuggestions",
+      "key": "improvementSuggestions",
+      "layout": {
+        "row": "Row_12"
+      }
+    },
+    {
+      "label": "Дополнительные комментарии",
+      "type": "textarea",
+      "id": "Field_AdditionalFeedback",
+      "key": "additionalFeedback",
+      "layout": {
+        "row": "Row_13"
+      }
+    },
+    {
+      "label": "Рекомендуете ли вы наш отель другим?",
+      "type": "select",
+      "id": "Field_WouldRecommend",
+      "key": "wouldRecommend",
+      "layout": {
+        "row": "Row_14"
+      },
+      "validate": {
+        "required": true
+      },
+      "values": [
+        {
+          "label": "Да, обязательно",
+          "value": "definitely"
+        },
+        {
+          "label": "Скорее да",
+          "value": "probably"
+        },
+        {
+          "label": "Не уверен",
+          "value": "notSure"
+        },
+        {
+          "label": "Скорее нет",
+          "value": "probablyNot"
+        },
+        {
+          "label": "Нет",
+          "value": "no"
+        }
+      ]
+    },
+    {
+      "label": "Планируете ли вы вернуться к нам?",
+      "type": "select",
+      "id": "Field_WillReturn",
+      "key": "willReturn",
+      "layout": {
+        "row": "Row_15"
+      },
+      "values": [
+        {
+          "label": "Да, обязательно",
+          "value": "definitely"
+        },
+        {
+          "label": "Вероятно",
+          "value": "likely"
+        },
+        {
+          "label": "Возможно",
+          "value": "maybe"
+        },
+        {
+          "label": "Маловероятно",
+          "value": "unlikely"
+        },
+        {
+          "label": "Нет",
+          "value": "no"
+        }
+      ]
+    },
+    {
+      "label": "Можем ли мы опубликовать ваш отзыв?",
+      "type": "checkbox",
+      "id": "Field_PublishPermission",
+      "key": "publishPermission",
+      "layout": {
+        "row": "Row_16"
+      }
+    },
+    {
+      "label": "Дата заполнения",
+      "type": "datetime",
+      "subtype": "date",
+      "id": "Field_FeedbackDate",
+      "key": "feedbackDate",
+      "dateLabel": "Дата",
+      "layout": {
+        "row": "Row_17"
+      },
+      "defaultValue": "=now()"
+    }
+  ],
+  "type": "default",
+  "id": "FeedbackForm",
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.5.0"
+}
