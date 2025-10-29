@@ -1,0 +1,364 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.36.1" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.5.0">
+  <bpmn:collaboration id="Collaboration_PetHotel">
+    <bpmn:participant id="Participant_PetHotel" name="Фندق للдомашних животных" processRef="PetHotelProcess_v1" />
+  </bpmn:collaboration>
+  <bpmn:process id="PetHotelProcess_v1" name="Процесс работы отеля для питомцев" isExecutable="true">
+    <bpmn:laneSet id="LaneSet_1">
+      <bpmn:lane id="Lane_Housekeeping" name="Хозяйственный отдел">
+        <bpmn:flowNodeRef>Task_CleanRoom</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_RoomReady</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_CareSpecialist" name="Специалист по уходу">
+        <bpmn:flowNodeRef>Task_AssignRoom</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_CheckInJoin</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_PrepareForDeparture</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>SubProcess_DailyCare</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Veterinary" name="Ветеринарный специалист">
+        <bpmn:flowNodeRef>Task_VetCheck</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_ClientService" name="Специалист по приему">
+        <bpmn:flowNodeRef>StartEvent_BookingRequest</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_RegisterBooking</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_CheckIn</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_CheckInSplit</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_FinalCheckout</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_PostStaySplit</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_PetLeft</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="StartEvent_BookingRequest" name="Получен запрос на бронь">
+      <bpmn:outgoing>Flow_To_RegisterBooking</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="Task_RegisterBooking" name="Зарегистрировать бронь" camunda:formRef="BookingForm" camunda:formRefBinding="latest">
+      <bpmn:extensionElements>
+        <zeebe:formDefinition formKey="camunda-forms:bpmn:BookingForm" />
+        <zeebe:assignmentDefinition candidateGroups="specialist-priem" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_To_RegisterBooking</bpmn:incoming>
+      <bpmn:outgoing>Flow_To_CheckIn</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="Task_CheckIn" name="Провести регистрацию заезда">
+      <bpmn:extensionElements>
+        <zeebe:assignmentDefinition candidateGroups="specialist-priem" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_To_CheckIn</bpmn:incoming>
+      <bpmn:outgoing>Flow_To_ParallelVetCheck</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:parallelGateway id="Gateway_CheckInSplit">
+      <bpmn:incoming>Flow_To_ParallelVetCheck</bpmn:incoming>
+      <bpmn:outgoing>Flow_To_VetCheck</bpmn:outgoing>
+      <bpmn:outgoing>Flow_To_AssignRoom</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:userTask id="Task_VetCheck" name="Провести вет. осмотр">
+      <bpmn:extensionElements>
+        <zeebe:assignmentDefinition candidateGroups="veterinar" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_To_VetCheck</bpmn:incoming>
+      <bpmn:outgoing>Flow_From_VetCheck</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="Task_AssignRoom" name="Разместить питомца в номере">
+      <bpmn:extensionElements>
+        <zeebe:assignmentDefinition candidateGroups="care-specialist" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_To_AssignRoom</bpmn:incoming>
+      <bpmn:outgoing>Flow_From_AssignRoom</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:parallelGateway id="Gateway_CheckInJoin">
+      <bpmn:incoming>Flow_From_VetCheck</bpmn:incoming>
+      <bpmn:incoming>Flow_From_AssignRoom</bpmn:incoming>
+      <bpmn:outgoing>Flow_To_DailyCare</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:userTask id="Task_PrepareForDeparture" name="Подготовить питомца к отъезду">
+      <bpmn:extensionElements>
+        <zeebe:assignmentDefinition candidateGroups="care-specialist" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_To_PrepareDeparture</bpmn:incoming>
+      <bpmn:outgoing>Flow_To_FinalCheckout</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="Task_FinalCheckout" name="Провести выписку и расчет">
+      <bpmn:extensionElements>
+        <zeebe:assignmentDefinition candidateGroups="specialist-priem" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_To_FinalCheckout</bpmn:incoming>
+      <bpmn:outgoing>Flow_To_PostStaySplit</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:parallelGateway id="Gateway_PostStaySplit">
+      <bpmn:incoming>Flow_To_PostStaySplit</bpmn:incoming>
+      <bpmn:outgoing>Flow_To_PetLeft</bpmn:outgoing>
+      <bpmn:outgoing>Flow_To_CleanRoom</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:endEvent id="EndEvent_PetLeft" name="Питомец покинул отель">
+      <bpmn:incoming>Flow_To_PetLeft</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:userTask id="Task_CleanRoom" name="Провести уборку и дезинфекцию номера">
+      <bpmn:extensionElements>
+        <zeebe:assignmentDefinition candidateGroups="housekeeping" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_To_CleanRoom</bpmn:incoming>
+      <bpmn:outgoing>Flow_To_RoomReady</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="EndEvent_RoomReady" name="Номер готов">
+      <bpmn:incoming>Flow_To_RoomReady</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:subProcess id="SubProcess_DailyCare" name="Ежедневный уход">
+      <bpmn:incoming>Flow_To_DailyCare</bpmn:incoming>
+      <bpmn:outgoing>Flow_To_PrepareDeparture</bpmn:outgoing>
+      <bpmn:startEvent id="Start_DailyCare">
+        <bpmn:outgoing>Flow_To_CompatibilityCheck</bpmn:outgoing>
+      </bpmn:startEvent>
+      <bpmn:businessRuleTask id="Task_CompatibilityCheck" name="Оценить совместимость">
+        <bpmn:extensionElements>
+          <zeebe:calledDecision decisionId="pet_compatibility_check" resultVariable="compatibilityResult" />
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_To_CompatibilityCheck</bpmn:incoming>
+        <bpmn:outgoing>Flow_To_GroupPlayDecision</bpmn:outgoing>
+      </bpmn:businessRuleTask>
+      <bpmn:exclusiveGateway id="Gateway_GroupPlayDecision" name="Совместим?">
+        <bpmn:incoming>Flow_To_GroupPlayDecision</bpmn:incoming>
+        <bpmn:outgoing>Flow_To_GroupPlay</bpmn:outgoing>
+        <bpmn:outgoing>Flow_To_IndividualPlay</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:userTask id="Task_GroupPlay" name="Организовать групповые игры">
+        <bpmn:extensionElements>
+          <zeebe:assignmentDefinition candidateGroups="care-specialist" />
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_To_GroupPlay</bpmn:incoming>
+        <bpmn:outgoing>Flow_End_Play</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:userTask id="Task_IndividualPlay" name="Организовать индивидуальные игры">
+        <bpmn:extensionElements>
+          <zeebe:assignmentDefinition candidateGroups="care-specialist" />
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_To_IndividualPlay</bpmn:incoming>
+        <bpmn:outgoing>Flow_End_Play_2</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:exclusiveGateway id="Gateway_PlayJoin">
+        <bpmn:incoming>Flow_End_Play</bpmn:incoming>
+        <bpmn:incoming>Flow_End_Play_2</bpmn:incoming>
+        <bpmn:outgoing>Flow_To_EndDailyCare</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:endEvent id="End_DailyCare">
+        <bpmn:incoming>Flow_To_EndDailyCare</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:sequenceFlow id="Flow_To_CompatibilityCheck" sourceRef="Start_DailyCare" targetRef="Task_CompatibilityCheck" />
+      <bpmn:sequenceFlow id="Flow_To_GroupPlayDecision" sourceRef="Task_CompatibilityCheck" targetRef="Gateway_GroupPlayDecision" />
+      <bpmn:sequenceFlow id="Flow_To_GroupPlay" name="Да" sourceRef="Gateway_GroupPlayDecision" targetRef="Task_GroupPlay">
+        <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=compatibilityResult.уровеньСовместимости != "Несовместим"</bpmn:conditionExpression>
+      </bpmn:sequenceFlow>
+      <bpmn:sequenceFlow id="Flow_To_IndividualPlay" name="Нет" sourceRef="Gateway_GroupPlayDecision" targetRef="Task_IndividualPlay">
+        <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=compatibilityResult.уровеньСовместимости = "Несовместим"</bpmn:conditionExpression>
+      </bpmn:sequenceFlow>
+      <bpmn:sequenceFlow id="Flow_End_Play" sourceRef="Task_GroupPlay" targetRef="Gateway_PlayJoin" />
+      <bpmn:sequenceFlow id="Flow_End_Play_2" sourceRef="Task_IndividualPlay" targetRef="Gateway_PlayJoin" />
+      <bpmn:sequenceFlow id="Flow_To_EndDailyCare" sourceRef="Gateway_PlayJoin" targetRef="End_DailyCare" />
+    </bpmn:subProcess>
+    <bpmn:sequenceFlow id="Flow_To_RegisterBooking" sourceRef="StartEvent_BookingRequest" targetRef="Task_RegisterBooking" />
+    <bpmn:sequenceFlow id="Flow_To_CheckIn" sourceRef="Task_RegisterBooking" targetRef="Task_CheckIn" />
+    <bpmn:sequenceFlow id="Flow_To_ParallelVetCheck" sourceRef="Task_CheckIn" targetRef="Gateway_CheckInSplit" />
+    <bpmn:sequenceFlow id="Flow_To_VetCheck" sourceRef="Gateway_CheckInSplit" targetRef="Task_VetCheck" />
+    <bpmn:sequenceFlow id="Flow_To_AssignRoom" sourceRef="Gateway_CheckInSplit" targetRef="Task_AssignRoom" />
+    <bpmn:sequenceFlow id="Flow_From_VetCheck" sourceRef="Task_VetCheck" targetRef="Gateway_CheckInJoin" />
+    <bpmn:sequenceFlow id="Flow_From_AssignRoom" sourceRef="Task_AssignRoom" targetRef="Gateway_CheckInJoin" />
+    <bpmn:sequenceFlow id="Flow_To_DailyCare" sourceRef="Gateway_CheckInJoin" targetRef="SubProcess_DailyCare" />
+    <bpmn:sequenceFlow id="Flow_To_PrepareDeparture" sourceRef="SubProcess_DailyCare" targetRef="Task_PrepareForDeparture" />
+    <bpmn:sequenceFlow id="Flow_To_FinalCheckout" sourceRef="Task_PrepareForDeparture" targetRef="Task_FinalCheckout" />
+    <bpmn:sequenceFlow id="Flow_To_PostStaySplit" sourceRef="Task_FinalCheckout" targetRef="Gateway_PostStaySplit" />
+    <bpmn:sequenceFlow id="Flow_To_PetLeft" sourceRef="Gateway_PostStaySplit" targetRef="EndEvent_PetLeft" />
+    <bpmn:sequenceFlow id="Flow_To_CleanRoom" sourceRef="Gateway_PostStaySplit" targetRef="Task_CleanRoom" />
+    <bpmn:sequenceFlow id="Flow_To_RoomReady" sourceRef="Task_CleanRoom" targetRef="EndEvent_RoomReady" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_PetHotel">
+      <bpmndi:BPMNShape id="Participant_0tke3q1_di" bpmnElement="Participant_PetHotel" isHorizontal="true">
+        <dc:Bounds x="160" y="80" width="1831" height="690" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_1o5u788_di" bpmnElement="Lane_ClientService" isHorizontal="true">
+        <dc:Bounds x="190" y="80" width="1801" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_1yl86nb_di" bpmnElement="Lane_Veterinary" isHorizontal="true">
+        <dc:Bounds x="190" y="230" width="1801" height="130" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_1g6uj0g_di" bpmnElement="Lane_CareSpecialist" isHorizontal="true">
+        <dc:Bounds x="190" y="360" width="1801" height="280" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_1f9gdw3_di" bpmnElement="Lane_Housekeeping" isHorizontal="true">
+        <dc:Bounds x="190" y="640" width="1801" height="130" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_BookingRequest_di" bpmnElement="StartEvent_BookingRequest">
+        <dc:Bounds x="233" y="152" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="210" y="195" width="83" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_RegisterBooking_di" bpmnElement="Task_RegisterBooking">
+        <dc:Bounds x="301" y="130" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CheckIn_di" bpmnElement="Task_CheckIn">
+        <dc:Bounds x="461" y="130" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1v2fso8_di" bpmnElement="Gateway_CheckInSplit">
+        <dc:Bounds x="626" y="145" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_VetCheck_di" bpmnElement="Task_VetCheck">
+        <dc:Bounds x="751" y="250" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_AssignRoom_di" bpmnElement="Task_AssignRoom">
+        <dc:Bounds x="751" y="440" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0f5sdv4_di" bpmnElement="Gateway_CheckInJoin">
+        <dc:Bounds x="896" y="455" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_PrepareForDeparture_di" bpmnElement="Task_PrepareForDeparture">
+        <dc:Bounds x="1591" y="440" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_FinalCheckout_di" bpmnElement="Task_FinalCheckout">
+        <dc:Bounds x="1721" y="130" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_19k7s0w_di" bpmnElement="Gateway_PostStaySplit">
+        <dc:Bounds x="1846" y="145" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_PetLeft_di" bpmnElement="EndEvent_PetLeft">
+        <dc:Bounds x="1923" y="152" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1897" y="195" width="89" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CleanRoom_di" bpmnElement="Task_CleanRoom">
+        <dc:Bounds x="1821" y="660" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_RoomReady_di" bpmnElement="EndEvent_RoomReady">
+        <dc:Bounds x="1953" y="682" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1939" y="725" width="64" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0kpgslk_di" bpmnElement="SubProcess_DailyCare" isExpanded="true">
+        <dc:Bounds x="971" y="380" width="580" height="240" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_09n8vld_di" bpmnElement="Start_DailyCare">
+        <dc:Bounds x="993" y="482" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_12vlnoc_di" bpmnElement="Task_CompatibilityCheck">
+        <dc:Bounds x="1061" y="460" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0s8j6c7_di" bpmnElement="Gateway_GroupPlayDecision" isMarkerVisible="true">
+        <dc:Bounds x="1186" y="475" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1179" y="532" width="65" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_13d5ybu_di" bpmnElement="Task_GroupPlay">
+        <dc:Bounds x="1261" y="390" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0s1nflz_di" bpmnElement="Task_IndividualPlay">
+        <dc:Bounds x="1261" y="530" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_16a3rtq_di" bpmnElement="Gateway_PlayJoin" isMarkerVisible="true">
+        <dc:Bounds x="1361" y="475" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1l6n2df_di" bpmnElement="End_DailyCare">
+        <dc:Bounds x="1443" y="482" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_To_CompatibilityCheck_di" bpmnElement="Flow_To_CompatibilityCheck">
+        <di:waypoint x="1029" y="500" />
+        <di:waypoint x="1061" y="500" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_To_GroupPlayDecision_di" bpmnElement="Flow_To_GroupPlayDecision">
+        <di:waypoint x="1161" y="500" />
+        <di:waypoint x="1186" y="500" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_To_GroupPlay_di" bpmnElement="Flow_To_GroupPlay">
+        <di:waypoint x="1211" y="475" />
+        <di:waypoint x="1211" y="430" />
+        <di:waypoint x="1261" y="430" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1220" y="403" width="14" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_To_IndividualPlay_di" bpmnElement="Flow_To_IndividualPlay">
+        <di:waypoint x="1211" y="525" />
+        <di:waypoint x="1211" y="570" />
+        <di:waypoint x="1261" y="570" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1216" y="543" width="20" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_End_Play_di" bpmnElement="Flow_End_Play">
+        <di:waypoint x="1361" y="430" />
+        <di:waypoint x="1386" y="430" />
+        <di:waypoint x="1386" y="475" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_End_Play_2_di" bpmnElement="Flow_End_Play_2">
+        <di:waypoint x="1361" y="570" />
+        <di:waypoint x="1386" y="570" />
+        <di:waypoint x="1386" y="525" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_To_EndDailyCare_di" bpmnElement="Flow_To_EndDailyCare">
+        <di:waypoint x="1411" y="500" />
+        <di:waypoint x="1443" y="500" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_To_RegisterBooking_di" bpmnElement="Flow_To_RegisterBooking">
+        <di:waypoint x="269" y="170" />
+        <di:waypoint x="301" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_To_CheckIn_di" bpmnElement="Flow_To_CheckIn">
+        <di:waypoint x="401" y="170" />
+        <di:waypoint x="461" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_To_ParallelVetCheck_di" bpmnElement="Flow_To_ParallelVetCheck">
+        <di:waypoint x="561" y="170" />
+        <di:waypoint x="626" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_To_VetCheck_di" bpmnElement="Flow_To_VetCheck">
+        <di:waypoint x="651" y="195" />
+        <di:waypoint x="651" y="290" />
+        <di:waypoint x="751" y="290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_To_AssignRoom_di" bpmnElement="Flow_To_AssignRoom">
+        <di:waypoint x="651" y="195" />
+        <di:waypoint x="651" y="480" />
+        <di:waypoint x="751" y="480" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_From_VetCheck_di" bpmnElement="Flow_From_VetCheck">
+        <di:waypoint x="851" y="290" />
+        <di:waypoint x="921" y="290" />
+        <di:waypoint x="921" y="455" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_From_AssignRoom_di" bpmnElement="Flow_From_AssignRoom">
+        <di:waypoint x="851" y="480" />
+        <di:waypoint x="896" y="480" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_To_DailyCare_di" bpmnElement="Flow_To_DailyCare">
+        <di:waypoint x="946" y="480" />
+        <di:waypoint x="971" y="480" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_To_PrepareDeparture_di" bpmnElement="Flow_To_PrepareDeparture">
+        <di:waypoint x="1551" y="480" />
+        <di:waypoint x="1591" y="480" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_To_FinalCheckout_di" bpmnElement="Flow_To_FinalCheckout">
+        <di:waypoint x="1691" y="480" />
+        <di:waypoint x="1771" y="480" />
+        <di:waypoint x="1771" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_To_PostStaySplit_di" bpmnElement="Flow_To_PostStaySplit">
+        <di:waypoint x="1821" y="170" />
+        <di:waypoint x="1846" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_To_PetLeft_di" bpmnElement="Flow_To_PetLeft">
+        <di:waypoint x="1896" y="170" />
+        <di:waypoint x="1923" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_To_CleanRoom_di" bpmnElement="Flow_To_CleanRoom">
+        <di:waypoint x="1871" y="195" />
+        <di:waypoint x="1871" y="660" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_To_RoomReady_di" bpmnElement="Flow_To_RoomReady">
+        <di:waypoint x="1921" y="700" />
+        <di:waypoint x="1953" y="700" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
