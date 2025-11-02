@@ -115,9 +115,9 @@ done
 
 echo ""
 echo -e "${YELLOW}🔄 Deploying BPMN Process...${NC}"
-if [ -f "bpmn/PetHotelProcess_v2.bpmn" ]; then
-    echo "  ➤ PetHotelProcess_v2.bpmn"
-    $DEPLOY_CMD deploy "bpmn/PetHotelProcess_v2.bpmn" || { echo -e "${RED}❌ BPMN deployment failed${NC}"; exit 1; }
+if [ -f "bpmn/PetHotelProcess_v3.bpmn" ]; then
+    echo "  ➤ PetHotelProcess_v3.bpmn"
+    $DEPLOY_CMD deploy "bpmn/PetHotelProcess_v3.bpmn" || { echo -e "${RED}❌ BPMN deployment failed${NC}"; exit 1; }
 else
     echo -e "${RED}❌ BPMN file not found!${NC}"
     exit 1
@@ -160,7 +160,7 @@ if [ "$CREATE_INSTANCE" == "y" ] || [ "$CREATE_INSTANCE" == "Y" ]; then
       "specialRequests": "Любит играть с мячом"
     }'
     
-    $DEPLOY_CMD create instance PetHotelProcess_v2 --variables "$TEST_VARS"
+    $DEPLOY_CMD create instance PetHotelProcess_v3 --variables "$TEST_VARS"
     
     echo ""
     echo -e "${GREEN}✅ Test instance created!${NC}"

@@ -5,9 +5,9 @@ __pycache__/
 .venv/
 venv/
 node_modules
-reports
-scenarios
-images
-bpmn/v3Bimp
+reports/russian-report.py
+reports/arabic-report.py
+reports/report_arabic.docx
+reports/~$чет_ЛР_1_2_ГОСТ.docx
 bpmn/PetHotelProcess_v2.bpmn
 PetCompatibility
