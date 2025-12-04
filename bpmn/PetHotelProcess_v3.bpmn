@@ -43,7 +43,7 @@
     <bpmn:userTask id="Task_RegisterBooking" name="Зарегистрировать бронь">
       <bpmn:extensionElements>
         <zeebe:formDefinition formId="BookingForm" />
-        <zeebe:assignmentDefinition candidateGroups="specialist-priem" />
+        <zeebe:assignmentDefinition candidateGroups="task-supervisors" />
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0a</bpmn:incoming>
       <bpmn:outgoing>Flow_0b</bpmn:outgoing>
@@ -82,7 +82,7 @@
     <bpmn:userTask id="Task_CheckIn" name="Регистрация заезда">
       <bpmn:extensionElements>
         <zeebe:formDefinition formId="CheckInForm" />
-        <zeebe:assignmentDefinition candidateGroups="specialist-priem" />
+        <zeebe:assignmentDefinition candidateGroups="task-supervisors" />
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0d</bpmn:incoming>
       <bpmn:outgoing>Flow_0e</bpmn:outgoing>
@@ -98,7 +98,7 @@
     <bpmn:userTask id="Task_VetCheck" name="Вет. осмотр">
       <bpmn:extensionElements>
         <zeebe:formDefinition formId="VetCheckForm" />
-        <zeebe:assignmentDefinition candidateGroups="veterinar" />
+        <zeebe:assignmentDefinition candidateGroups="task-executors" />
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1a</bpmn:incoming>
       <bpmn:outgoing>Flow_2a</bpmn:outgoing>
@@ -107,7 +107,7 @@
     <bpmn:userTask id="Task_AssignRoom" name="Разместить в номере">
       <bpmn:extensionElements>
         <zeebe:formDefinition formId="RoomAssignmentForm" />
-        <zeebe:assignmentDefinition candidateGroups="care-specialist" />
+        <zeebe:assignmentDefinition candidateGroups="task-executors" />
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1b</bpmn:incoming>
       <bpmn:outgoing>Flow_2b</bpmn:outgoing>
@@ -133,7 +133,7 @@
       <bpmn:userTask id="Task_DailyFeeding" name="Кормление">
         <bpmn:extensionElements>
           <zeebe:formDefinition formId="FeedingForm" />
-          <zeebe:assignmentDefinition candidateGroups="care-specialist" />
+          <zeebe:assignmentDefinition candidateGroups="task-executors" />
         </bpmn:extensionElements>
         <bpmn:incoming>Flow_S1</bpmn:incoming>
         <bpmn:outgoing>Flow_S2</bpmn:outgoing>
@@ -142,7 +142,7 @@
       <bpmn:userTask id="Task_DailyWalk" name="Прогулка">
         <bpmn:extensionElements>
           <zeebe:formDefinition formId="WalkForm" />
-          <zeebe:assignmentDefinition candidateGroups="care-specialist" />
+          <zeebe:assignmentDefinition candidateGroups="task-executors" />
         </bpmn:extensionElements>
         <bpmn:incoming>Flow_S2</bpmn:incoming>
         <bpmn:outgoing>Flow_S3</bpmn:outgoing>
@@ -170,7 +170,7 @@
       <bpmn:userTask id="Task_GroupPlay" name="Групповые игры">
         <bpmn:extensionElements>
           <zeebe:formDefinition formId="DailyActivityForm" />
-          <zeebe:assignmentDefinition candidateGroups="care-specialist" />
+          <zeebe:assignmentDefinition candidateGroups="task-executors" />
         </bpmn:extensionElements>
         <bpmn:incoming>Flow_S5a</bpmn:incoming>
         <bpmn:outgoing>Flow_S6a</bpmn:outgoing>
@@ -179,7 +179,7 @@
       <bpmn:userTask id="Task_IndividualPlay" name="Индивидуальные игры">
         <bpmn:extensionElements>
           <zeebe:formDefinition formId="DailyActivityForm" />
-          <zeebe:assignmentDefinition candidateGroups="care-specialist" />
+          <zeebe:assignmentDefinition candidateGroups="task-executors" />
         </bpmn:extensionElements>
         <bpmn:incoming>Flow_S5b</bpmn:incoming>
         <bpmn:outgoing>Flow_S6b</bpmn:outgoing>
@@ -194,7 +194,7 @@
       <bpmn:userTask id="Task_OwnerUpdate" name="Отчет владельцу">
         <bpmn:extensionElements>
           <zeebe:formDefinition formId="OwnerUpdateForm" />
-          <zeebe:assignmentDefinition candidateGroups="care-specialist" />
+          <zeebe:assignmentDefinition candidateGroups="task-executors" />
         </bpmn:extensionElements>
         <bpmn:incoming>Flow_S7</bpmn:incoming>
         <bpmn:outgoing>Flow_S8</bpmn:outgoing>
@@ -234,7 +234,7 @@
     <bpmn:userTask id="Task_PrepareForDeparture" name="Подготовка к отъезду">
       <bpmn:extensionElements>
         <zeebe:formDefinition formId="DepartureForm" />
-        <zeebe:assignmentDefinition candidateGroups="care-specialist" />
+        <zeebe:assignmentDefinition candidateGroups="task-executors" />
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_4</bpmn:incoming>
       <bpmn:outgoing>Flow_5</bpmn:outgoing>
@@ -243,7 +243,7 @@
     <bpmn:userTask id="Task_FinalReport" name="Итоговый отчет">
       <bpmn:extensionElements>
         <zeebe:formDefinition formId="FinalReportForm" />
-        <zeebe:assignmentDefinition candidateGroups="care-specialist" />
+        <zeebe:assignmentDefinition candidateGroups="task-executors" />
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_5</bpmn:incoming>
       <bpmn:outgoing>Flow_6</bpmn:outgoing>
@@ -252,7 +252,7 @@
     <bpmn:userTask id="Task_Checkout" name="Выписка и расчет">
       <bpmn:extensionElements>
         <zeebe:formDefinition formId="CheckoutForm" />
-        <zeebe:assignmentDefinition candidateGroups="specialist-priem" />
+        <zeebe:assignmentDefinition candidateGroups="task-supervisors" />
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_6</bpmn:incoming>
       <bpmn:outgoing>Flow_7</bpmn:outgoing>
@@ -261,7 +261,7 @@
     <bpmn:userTask id="Task_Feedback" name="Собрать отзыв">
       <bpmn:extensionElements>
         <zeebe:formDefinition formId="FeedbackForm" />
-        <zeebe:assignmentDefinition candidateGroups="specialist-priem" />
+        <zeebe:assignmentDefinition candidateGroups="task-supervisors" />
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_7</bpmn:incoming>
       <bpmn:outgoing>Flow_8</bpmn:outgoing>
@@ -280,7 +280,7 @@
     <bpmn:userTask id="Task_CleanRoom" name="Уборка номера">
       <bpmn:extensionElements>
         <zeebe:formDefinition formId="CleaningForm" />
-        <zeebe:assignmentDefinition candidateGroups="housekeeping" />
+        <zeebe:assignmentDefinition candidateGroups="task-executors" />
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_9b</bpmn:incoming>
       <bpmn:outgoing>Flow_10</bpmn:outgoing>

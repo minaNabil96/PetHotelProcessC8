@@ -1,0 +1,9 @@
+camunda.tasklist:
+  identity:
+    enabled: true
+    issuerUrl: http://localhost:8085/auth/realms/camunda-platform
+    issuerBackendUrl: http://keycloak:8080/auth/realms/camunda-platform
+    clientId: tasklist
+    clientSecret: tasklist-secret
+    audience: tasklist
+    redirectRootUrl: http://localhost:8082

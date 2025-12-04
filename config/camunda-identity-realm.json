@@ -1,0 +1,155 @@
+{
+  "realm": "camunda-platform",
+  "enabled": true,
+  "users": [
+    {
+      "username": "admin",
+      "enabled": true,
+      "email": "admin@example.com",
+      "firstName": "Admin",
+      "lastName": "User",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "admin",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "camunda-admin"
+      ],
+      "groups": [
+        "camunda-admin"
+      ]
+    },
+    {
+      "username": "supervisor",
+      "enabled": true,
+      "email": "supervisor@example.com",
+      "firstName": "Task",
+      "lastName": "Supervisor",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "camunda",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "task-supervisor"
+      ],
+      "groups": [
+        "task-supervisors"
+      ]
+    },
+    {
+      "username": "executor",
+      "enabled": true,
+      "email": "executor@example.com",
+      "firstName": "Task",
+      "lastName": "Executor",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "camunda",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "task-executor"
+      ],
+      "groups": [
+        "task-executors"
+      ]
+    }
+  ],
+  "roles": {
+    "realm": [
+      {
+        "name": "camunda-admin",
+        "description": "Administrator with full access"
+      },
+      {
+        "name": "task-supervisor",
+        "description": "Supervisor who can view all tasks"
+      },
+      {
+        "name": "task-executor",
+        "description": "Worker who can only see assigned tasks"
+      }
+    ]
+  },
+  "groups": [
+    {
+      "name": "camunda-admin",
+      "path": "/camunda-admin"
+    },
+    {
+      "name": "task-supervisors",
+      "path": "/task-supervisors"
+    },
+    {
+      "name": "task-executors",
+      "path": "/task-executors"
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "operate",
+      "name": "Operate",
+      "rootUrl": "http://localhost:8081",
+      "baseUrl": "http://localhost:8081",
+      "redirectUris": [
+        "http://localhost:8081/*"
+      ],
+      "webOrigins": [
+        "*"
+      ],
+      "enabled": true,
+      "publicClient": true,
+      "protocol": "openid-connect",
+      "fullScopeAllowed": true
+    },
+    {
+      "clientId": "tasklist",
+      "name": "Tasklist",
+      "rootUrl": "http://localhost:8082",
+      "baseUrl": "http://localhost:8082",
+      "redirectUris": [
+        "http://localhost:8082/*"
+      ],
+      "webOrigins": [
+        "*"
+      ],
+      "enabled": true,
+      "publicClient": true,
+      "protocol": "openid-connect",
+      "fullScopeAllowed": true
+    },
+    {
+      "clientId": "identity",
+      "name": "Identity",
+      "rootUrl": "http://localhost:8084",
+      "baseUrl": "http://localhost:8084",
+      "redirectUris": [
+        "http://localhost:8084/*"
+      ],
+      "webOrigins": [
+        "*"
+      ],
+      "enabled": true,
+      "publicClient": true,
+      "protocol": "openid-connect",
+      "fullScopeAllowed": true
+    },
+    {
+      "clientId": "zeebe",
+      "name": "Zeebe",
+      "enabled": true,
+      "publicClient": false,
+      "secret": "zeebe-secret",
+      "protocol": "openid-connect",
+      "serviceAccountsEnabled": true
+    }
+  ]
+}

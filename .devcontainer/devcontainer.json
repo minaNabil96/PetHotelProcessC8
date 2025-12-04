@@ -1,0 +1,21 @@
+{
+  "name": "Camunda 8 Codespace",
+  "dockerComposeFile": "../docker-compose.yml",
+  "service": "zeebe",
+  "workspaceFolder": "/workspace",
+  "forwardPorts": [
+    26500,
+    8081,
+    8082,
+    8084,
+    8085
+  ],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "camunda.camunda-modeler-vscode-extension"
+      ]
+    }
+  },
+  "postCreateCommand": "bash scripts/setup-identity.sh"
+}
