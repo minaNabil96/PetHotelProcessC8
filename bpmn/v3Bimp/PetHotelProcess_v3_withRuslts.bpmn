@@ -1,0 +1,504 @@
+<?xml version="1.0" encoding="UTF-8"?><bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_PetHotel" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.0.0" xmlns:qbp="http://www.qbp-simulator.com/Schema201212" xmlns:qbpapi="http://www.qbp-simulator.com/ApiSchema201212">
+  <bpmn:collaboration id="Collaboration_PetHotel">
+    <bpmn:participant id="Participant_PetHotel" name="🏨 Отель для домашних животных" processRef="PetHotelProcess"/>
+  </bpmn:collaboration>
+  <bpmn:process id="PetHotelProcess" name="Процесс отеля для животных" isExecutable="true">
+    <bpmn:laneSet id="LaneSet_1">
+      <bpmn:lane id="Lane_Reception" name="📋 Специалист по приему">
+        <bpmn:flowNodeRef>Event_Start</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_RegisterBooking</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_CheckVaccination</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_VaccinationCheck</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_Rejected</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_GenerateContract</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_CheckIn</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_CheckInSplit</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Checkout</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Feedback</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_FinalSplit</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_PetLeft</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_SendReminder</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_ReminderSent</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Veterinarian" name="🩺 Ветеринар">
+        <bpmn:flowNodeRef>Task_VetCheck</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_CheckInJoin</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_CareSpecialist" name="🐾 Специалист по уходу">
+        <bpmn:flowNodeRef>Task_AssignRoom</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>SubProcess_DailyCare</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_PrepareForDeparture</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_FinalReport</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Housekeeping" name="🧹 Хозяйственный отдел">
+        <bpmn:flowNodeRef>Task_CleanRoom</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_RoomReady</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="Event_Start" name="Запрос получен">
+      <bpmn:outgoing>Flow_0a</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_0a" sourceRef="Event_Start" targetRef="Task_RegisterBooking"/>
+    <bpmn:userTask id="Task_RegisterBooking" name="Зарегистрировать бронь">
+      <bpmn:incoming>Flow_0a</bpmn:incoming>
+      <bpmn:outgoing>Flow_0b</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_0b" sourceRef="Task_RegisterBooking" targetRef="Task_CheckVaccination"/>
+    <bpmn:userTask id="Task_CheckVaccination" name="Проверить вакцинацию">
+      <bpmn:incoming>Flow_0b</bpmn:incoming>
+      <bpmn:outgoing>Flow_0c</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_0c" sourceRef="Task_CheckVaccination" targetRef="Gateway_VaccinationCheck"/>
+    <bpmn:exclusiveGateway id="Gateway_VaccinationCheck" name="Вакцинация OK?">
+      <bpmn:incoming>Flow_0c</bpmn:incoming>
+      <bpmn:outgoing>Flow_Approved</bpmn:outgoing>
+      <bpmn:outgoing>Flow_Rejected</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_Approved" name="Да" sourceRef="Gateway_VaccinationCheck" targetRef="Task_GenerateContract"/>
+    <bpmn:sequenceFlow id="Flow_Rejected" name="Нет" sourceRef="Gateway_VaccinationCheck" targetRef="Event_Rejected"/>
+    <bpmn:endEvent id="Event_Rejected" name="Отклонено">
+      <bpmn:incoming>Flow_Rejected</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="Task_GenerateContract" name="Сгенерировать договор">
+      <bpmn:incoming>Flow_Approved</bpmn:incoming>
+      <bpmn:outgoing>Flow_0d</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_0d" sourceRef="Task_GenerateContract" targetRef="Task_CheckIn"/>
+    <bpmn:userTask id="Task_CheckIn" name="Регистрация заезда">
+      <bpmn:incoming>Flow_0d</bpmn:incoming>
+      <bpmn:outgoing>Flow_0e</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_0e" sourceRef="Task_CheckIn" targetRef="Gateway_CheckInSplit"/>
+    <bpmn:parallelGateway id="Gateway_CheckInSplit">
+      <bpmn:incoming>Flow_0e</bpmn:incoming>
+      <bpmn:outgoing>Flow_1a</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1b</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:sequenceFlow id="Flow_1a" sourceRef="Gateway_CheckInSplit" targetRef="Task_VetCheck"/>
+    <bpmn:sequenceFlow id="Flow_1b" sourceRef="Gateway_CheckInSplit" targetRef="Task_AssignRoom"/>
+    <bpmn:userTask id="Task_VetCheck" name="Вет. осмотр">
+      <bpmn:incoming>Flow_1a</bpmn:incoming>
+      <bpmn:outgoing>Flow_2a</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_2a" sourceRef="Task_VetCheck" targetRef="Gateway_CheckInJoin"/>
+    <bpmn:userTask id="Task_AssignRoom" name="Разместить в номере">
+      <bpmn:incoming>Flow_1b</bpmn:incoming>
+      <bpmn:outgoing>Flow_2b</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_2b" sourceRef="Task_AssignRoom" targetRef="Gateway_CheckInJoin"/>
+    <bpmn:parallelGateway id="Gateway_CheckInJoin">
+      <bpmn:incoming>Flow_2a</bpmn:incoming>
+      <bpmn:incoming>Flow_2b</bpmn:incoming>
+      <bpmn:outgoing>Flow_3</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:sequenceFlow id="Flow_3" sourceRef="Gateway_CheckInJoin" targetRef="SubProcess_DailyCare"/>
+    <bpmn:subProcess id="SubProcess_DailyCare" name="Ежедневный уход">
+      <bpmn:incoming>Flow_3</bpmn:incoming>
+      <bpmn:outgoing>Flow_4</bpmn:outgoing>
+      <bpmn:startEvent id="Event_SubStart" name="Начало">
+        <bpmn:outgoing>Flow_S1</bpmn:outgoing>
+      </bpmn:startEvent>
+      <bpmn:sequenceFlow id="Flow_S1" sourceRef="Event_SubStart" targetRef="Task_DailyFeeding"/>
+      <bpmn:userTask id="Task_DailyFeeding" name="Кормление">
+        <bpmn:incoming>Flow_S1</bpmn:incoming>
+        <bpmn:outgoing>Flow_S2</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:sequenceFlow id="Flow_S2" sourceRef="Task_DailyFeeding" targetRef="Task_DailyWalk"/>
+      <bpmn:userTask id="Task_DailyWalk" name="Прогулка">
+        <bpmn:incoming>Flow_S2</bpmn:incoming>
+        <bpmn:outgoing>Flow_S3</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:sequenceFlow id="Flow_S3" sourceRef="Task_DailyWalk" targetRef="Task_CompatibilityCheck"/>
+      <bpmn:userTask id="Task_CompatibilityCheck" name="Оценить совместимость">
+        <bpmn:incoming>Flow_S3</bpmn:incoming>
+        <bpmn:outgoing>Flow_S4</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:sequenceFlow id="Flow_S4" sourceRef="Task_CompatibilityCheck" targetRef="Gateway_PlayDecision"/>
+      <bpmn:exclusiveGateway id="Gateway_PlayDecision" name="Совместим?">
+        <bpmn:incoming>Flow_S4</bpmn:incoming>
+        <bpmn:outgoing>Flow_S5a</bpmn:outgoing>
+        <bpmn:outgoing>Flow_S5b</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:sequenceFlow id="Flow_S5a" name="Да" sourceRef="Gateway_PlayDecision" targetRef="Task_GroupPlay"/>
+      <bpmn:sequenceFlow id="Flow_S5b" name="Нет" sourceRef="Gateway_PlayDecision" targetRef="Task_IndividualPlay"/>
+      <bpmn:userTask id="Task_GroupPlay" name="Групповые игры">
+        <bpmn:incoming>Flow_S5a</bpmn:incoming>
+        <bpmn:outgoing>Flow_S6a</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:sequenceFlow id="Flow_S6a" sourceRef="Task_GroupPlay" targetRef="Gateway_PlayJoin"/>
+      <bpmn:userTask id="Task_IndividualPlay" name="Индивидуальные игры">
+        <bpmn:incoming>Flow_S5b</bpmn:incoming>
+        <bpmn:outgoing>Flow_S6b</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:sequenceFlow id="Flow_S6b" sourceRef="Task_IndividualPlay" targetRef="Gateway_PlayJoin"/>
+      <bpmn:exclusiveGateway id="Gateway_PlayJoin">
+        <bpmn:incoming>Flow_S6a</bpmn:incoming>
+        <bpmn:incoming>Flow_S6b</bpmn:incoming>
+        <bpmn:outgoing>Flow_S7</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:sequenceFlow id="Flow_S7" sourceRef="Gateway_PlayJoin" targetRef="Task_OwnerUpdate"/>
+      <bpmn:userTask id="Task_OwnerUpdate" name="Отчет владельцу">
+        <bpmn:incoming>Flow_S7</bpmn:incoming>
+        <bpmn:outgoing>Flow_S8</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:sequenceFlow id="Flow_S8" sourceRef="Task_OwnerUpdate" targetRef="Event_SubEnd"/>
+      <bpmn:endEvent id="Event_SubEnd" name="Конец ухода">
+        <bpmn:incoming>Flow_S8</bpmn:incoming>
+      </bpmn:endEvent>
+    </bpmn:subProcess>
+    <bpmn:boundaryEvent id="Event_DepartureReminder" name="За день до выезда" cancelActivity="false" attachedToRef="SubProcess_DailyCare">
+      <bpmn:outgoing>Flow_Reminder</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="TimerEventDefinition_Reminder">
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">P1D</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:boundaryEvent>
+    <bpmn:sequenceFlow id="Flow_Reminder" sourceRef="Event_DepartureReminder" targetRef="Task_SendReminder"/>
+    <bpmn:serviceTask id="Task_SendReminder" name="Напомнить">
+      <bpmn:incoming>Flow_Reminder</bpmn:incoming>
+      <bpmn:outgoing>Flow_ReminderEnd</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_ReminderEnd" sourceRef="Task_SendReminder" targetRef="Event_ReminderSent"/>
+    <bpmn:endEvent id="Event_ReminderSent" name="Отправлено">
+      <bpmn:incoming>Flow_ReminderEnd</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_4" sourceRef="SubProcess_DailyCare" targetRef="Task_PrepareForDeparture"/>
+    <bpmn:userTask id="Task_PrepareForDeparture" name="Подготовка к отъезду">
+      <bpmn:incoming>Flow_4</bpmn:incoming>
+      <bpmn:outgoing>Flow_5</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_5" sourceRef="Task_PrepareForDeparture" targetRef="Task_FinalReport"/>
+    <bpmn:userTask id="Task_FinalReport" name="Итоговый отчет">
+      <bpmn:incoming>Flow_5</bpmn:incoming>
+      <bpmn:outgoing>Flow_6</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_6" sourceRef="Task_FinalReport" targetRef="Task_Checkout"/>
+    <bpmn:userTask id="Task_Checkout" name="Выписка и расчет">
+      <bpmn:incoming>Flow_6</bpmn:incoming>
+      <bpmn:outgoing>Flow_7</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_7" sourceRef="Task_Checkout" targetRef="Task_Feedback"/>
+    <bpmn:userTask id="Task_Feedback" name="Собрать отзыв">
+      <bpmn:incoming>Flow_7</bpmn:incoming>
+      <bpmn:outgoing>Flow_8</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_8" sourceRef="Task_Feedback" targetRef="Gateway_FinalSplit"/>
+    <bpmn:parallelGateway id="Gateway_FinalSplit">
+      <bpmn:incoming>Flow_8</bpmn:incoming>
+      <bpmn:outgoing>Flow_9a</bpmn:outgoing>
+      <bpmn:outgoing>Flow_9b</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:sequenceFlow id="Flow_9a" sourceRef="Gateway_FinalSplit" targetRef="Event_PetLeft"/>
+    <bpmn:sequenceFlow id="Flow_9b" sourceRef="Gateway_FinalSplit" targetRef="Task_CleanRoom"/>
+    <bpmn:endEvent id="Event_PetLeft" name="Питомец уехал">
+      <bpmn:incoming>Flow_9a</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:userTask id="Task_CleanRoom" name="Уборка номера">
+      <bpmn:incoming>Flow_9b</bpmn:incoming>
+      <bpmn:outgoing>Flow_10</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_10" sourceRef="Task_CleanRoom" targetRef="Event_RoomReady"/>
+    <bpmn:endEvent id="Event_RoomReady" name="Номер готов">
+      <bpmn:incoming>Flow_10</bpmn:incoming>
+    </bpmn:endEvent>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_PetHotel">
+      <bpmndi:BPMNShape id="Participant_di" bpmnElement="Participant_PetHotel" isHorizontal="true">
+        <dc:Bounds x="160" y="80" width="3800" height="880"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Reception_di" bpmnElement="Lane_Reception" isHorizontal="true">
+        <dc:Bounds x="190" y="80" width="3770" height="200"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Veterinarian_di" bpmnElement="Lane_Veterinarian" isHorizontal="true">
+        <dc:Bounds x="190" y="280" width="3770" height="140"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_CareSpecialist_di" bpmnElement="Lane_CareSpecialist" isHorizontal="true">
+        <dc:Bounds x="190" y="420" width="3770" height="380"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Housekeeping_di" bpmnElement="Lane_Housekeeping" isHorizontal="true">
+        <dc:Bounds x="190" y="800" width="3770" height="160"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_Start_di" bpmnElement="Event_Start">
+        <dc:Bounds x="242" y="162" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="224" y="205" width="73" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_RegisterBooking_di" bpmnElement="Task_RegisterBooking">
+        <dc:Bounds x="330" y="140" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CheckVaccination_di" bpmnElement="Task_CheckVaccination">
+        <dc:Bounds x="480" y="140" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_VaccinationCheck_di" bpmnElement="Gateway_VaccinationCheck" isMarkerVisible="true">
+        <dc:Bounds x="635" y="155" width="50" height="50"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="620" y="125" width="81" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_Rejected_di" bpmnElement="Event_Rejected">
+        <dc:Bounds x="642" y="232" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="633" y="275" width="55" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_GenerateContract_di" bpmnElement="Task_GenerateContract">
+        <dc:Bounds x="740" y="140" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CheckIn_di" bpmnElement="Task_CheckIn">
+        <dc:Bounds x="890" y="140" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_CheckInSplit_di" bpmnElement="Gateway_CheckInSplit">
+        <dc:Bounds x="1045" y="155" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Checkout_di" bpmnElement="Task_Checkout">
+        <dc:Bounds x="3410" y="140" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Feedback_di" bpmnElement="Task_Feedback">
+        <dc:Bounds x="3560" y="140" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_FinalSplit_di" bpmnElement="Gateway_FinalSplit">
+        <dc:Bounds x="3715" y="155" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_PetLeft_di" bpmnElement="Event_PetLeft">
+        <dc:Bounds x="3822" y="162" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3799" y="205" width="82" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_SendReminder_di" bpmnElement="Task_SendReminder">
+        <dc:Bounds x="3200" y="140" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_ReminderSent_di" bpmnElement="Event_ReminderSent">
+        <dc:Bounds x="3232" y="82" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3218" y="52" width="65" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_VetCheck_di" bpmnElement="Task_VetCheck">
+        <dc:Bounds x="1140" y="310" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_CheckInJoin_di" bpmnElement="Gateway_CheckInJoin">
+        <dc:Bounds x="1295" y="325" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_AssignRoom_di" bpmnElement="Task_AssignRoom">
+        <dc:Bounds x="1140" y="500" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SubProcess_DailyCare_di" bpmnElement="SubProcess_DailyCare" isExpanded="true">
+        <dc:Bounds x="1400" y="450" width="1720" height="310"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_SubStart_di" bpmnElement="Event_SubStart">
+        <dc:Bounds x="1432" y="562" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1428" y="605" width="44" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_DailyFeeding_di" bpmnElement="Task_DailyFeeding">
+        <dc:Bounds x="1520" y="540" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_DailyWalk_di" bpmnElement="Task_DailyWalk">
+        <dc:Bounds x="1670" y="540" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CompatibilityCheck_di" bpmnElement="Task_CompatibilityCheck">
+        <dc:Bounds x="1820" y="540" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_PlayDecision_di" bpmnElement="Gateway_PlayDecision" isMarkerVisible="true">
+        <dc:Bounds x="1975" y="555" width="50" height="50"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1967" y="525" width="65" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_GroupPlay_di" bpmnElement="Task_GroupPlay">
+        <dc:Bounds x="2080" y="480" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_IndividualPlay_di" bpmnElement="Task_IndividualPlay">
+        <dc:Bounds x="2080" y="620" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_PlayJoin_di" bpmnElement="Gateway_PlayJoin" isMarkerVisible="true">
+        <dc:Bounds x="2235" y="555" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_OwnerUpdate_di" bpmnElement="Task_OwnerUpdate">
+        <dc:Bounds x="2340" y="540" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_SubEnd_di" bpmnElement="Event_SubEnd">
+        <dc:Bounds x="2492" y="562" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2475" y="605" width="70" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_S1_di" bpmnElement="Flow_S1">
+        <di:waypoint x="1468" y="580"/>
+        <di:waypoint x="1520" y="580"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_S2_di" bpmnElement="Flow_S2">
+        <di:waypoint x="1620" y="580"/>
+        <di:waypoint x="1670" y="580"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_S3_di" bpmnElement="Flow_S3">
+        <di:waypoint x="1770" y="580"/>
+        <di:waypoint x="1820" y="580"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_S4_di" bpmnElement="Flow_S4">
+        <di:waypoint x="1920" y="580"/>
+        <di:waypoint x="1975" y="580"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_S5a_di" bpmnElement="Flow_S5a">
+        <di:waypoint x="2000" y="555"/>
+        <di:waypoint x="2000" y="520"/>
+        <di:waypoint x="2080" y="520"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2006" y="535" width="14" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_S5b_di" bpmnElement="Flow_S5b">
+        <di:waypoint x="2000" y="605"/>
+        <di:waypoint x="2000" y="660"/>
+        <di:waypoint x="2080" y="660"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2002" y="630" width="20" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_S6a_di" bpmnElement="Flow_S6a">
+        <di:waypoint x="2180" y="520"/>
+        <di:waypoint x="2260" y="520"/>
+        <di:waypoint x="2260" y="555"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_S6b_di" bpmnElement="Flow_S6b">
+        <di:waypoint x="2180" y="660"/>
+        <di:waypoint x="2260" y="660"/>
+        <di:waypoint x="2260" y="605"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_S7_di" bpmnElement="Flow_S7">
+        <di:waypoint x="2285" y="580"/>
+        <di:waypoint x="2340" y="580"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_S8_di" bpmnElement="Flow_S8">
+        <di:waypoint x="2440" y="580"/>
+        <di:waypoint x="2492" y="580"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_DepartureReminder_di" bpmnElement="Event_DepartureReminder">
+        <dc:Bounds x="3102" y="742" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3078" y="785" width="85" height="27"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_PrepareForDeparture_di" bpmnElement="Task_PrepareForDeparture">
+        <dc:Bounds x="3180" y="650" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_FinalReport_di" bpmnElement="Task_FinalReport">
+        <dc:Bounds x="3330" y="650" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CleanRoom_di" bpmnElement="Task_CleanRoom">
+        <dc:Bounds x="3690" y="840" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_RoomReady_di" bpmnElement="Event_RoomReady">
+        <dc:Bounds x="3842" y="862" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3825" y="905" width="70" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0a_di" bpmnElement="Flow_0a">
+        <di:waypoint x="278" y="180"/>
+        <di:waypoint x="330" y="180"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0b_di" bpmnElement="Flow_0b">
+        <di:waypoint x="430" y="180"/>
+        <di:waypoint x="480" y="180"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0c_di" bpmnElement="Flow_0c">
+        <di:waypoint x="580" y="180"/>
+        <di:waypoint x="635" y="180"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Approved_di" bpmnElement="Flow_Approved">
+        <di:waypoint x="685" y="180"/>
+        <di:waypoint x="740" y="180"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="704" y="162" width="14" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Rejected_di" bpmnElement="Flow_Rejected">
+        <di:waypoint x="660" y="205"/>
+        <di:waypoint x="660" y="232"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="664" y="216" width="20" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0d_di" bpmnElement="Flow_0d">
+        <di:waypoint x="840" y="180"/>
+        <di:waypoint x="890" y="180"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0e_di" bpmnElement="Flow_0e">
+        <di:waypoint x="990" y="180"/>
+        <di:waypoint x="1045" y="180"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1a_di" bpmnElement="Flow_1a">
+        <di:waypoint x="1070" y="205"/>
+        <di:waypoint x="1070" y="350"/>
+        <di:waypoint x="1140" y="350"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1b_di" bpmnElement="Flow_1b">
+        <di:waypoint x="1070" y="205"/>
+        <di:waypoint x="1070" y="540"/>
+        <di:waypoint x="1140" y="540"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_2a_di" bpmnElement="Flow_2a">
+        <di:waypoint x="1240" y="350"/>
+        <di:waypoint x="1295" y="350"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_2b_di" bpmnElement="Flow_2b">
+        <di:waypoint x="1240" y="540"/>
+        <di:waypoint x="1320" y="540"/>
+        <di:waypoint x="1320" y="375"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_3_di" bpmnElement="Flow_3">
+        <di:waypoint x="1320" y="375"/>
+        <di:waypoint x="1320" y="605"/>
+        <di:waypoint x="1400" y="605"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Reminder_di" bpmnElement="Flow_Reminder">
+        <di:waypoint x="3120" y="742"/>
+        <di:waypoint x="3120" y="180"/>
+        <di:waypoint x="3200" y="180"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ReminderEnd_di" bpmnElement="Flow_ReminderEnd">
+        <di:waypoint x="3250" y="140"/>
+        <di:waypoint x="3250" y="118"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_4_di" bpmnElement="Flow_4">
+        <di:waypoint x="3120" y="605"/>
+        <di:waypoint x="3150" y="605"/>
+        <di:waypoint x="3150" y="690"/>
+        <di:waypoint x="3180" y="690"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_5_di" bpmnElement="Flow_5">
+        <di:waypoint x="3280" y="690"/>
+        <di:waypoint x="3330" y="690"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_6_di" bpmnElement="Flow_6">
+        <di:waypoint x="3380" y="650"/>
+        <di:waypoint x="3380" y="180"/>
+        <di:waypoint x="3410" y="180"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_7_di" bpmnElement="Flow_7">
+        <di:waypoint x="3510" y="180"/>
+        <di:waypoint x="3560" y="180"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_8_di" bpmnElement="Flow_8">
+        <di:waypoint x="3660" y="180"/>
+        <di:waypoint x="3715" y="180"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_9a_di" bpmnElement="Flow_9a">
+        <di:waypoint x="3765" y="180"/>
+        <di:waypoint x="3822" y="180"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_9b_di" bpmnElement="Flow_9b">
+        <di:waypoint x="3740" y="205"/>
+        <di:waypoint x="3740" y="840"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_10_di" bpmnElement="Flow_10">
+        <di:waypoint x="3790" y="880"/>
+        <di:waypoint x="3842" y="880"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+<qbp:processSimulationInfo xmlns:qbp="http://www.qbp-simulator.com/Schema201212" id="qbp_00a27c4a-4693-1784-977d-ef0a858f185e" processInstances="100" startDateTime="2025-10-30T06:00:00.000Z" currency="USD"><qbp:arrivalRateDistribution type="FIXED" mean="7200" arg1="NaN" arg2="NaN"><qbp:timeUnit>hours</qbp:timeUnit></qbp:arrivalRateDistribution><qbp:timetables><qbp:timetable id="QBP_DEFAULT_TIMETABLE" default="true" name="Default"><qbp:rules><qbp:rule fromTime="09:00:00.000+00:00" toTime="17:00:00.000+00:00" fromWeekDay="MONDAY" toWeekDay="FRIDAY"/></qbp:rules></qbp:timetable><qbp:timetable id="QBP_247_TIMETABLE" default="false" name="24/7"><qbp:rules><qbp:rule fromTime="00:00:00.000+00:00" toTime="23:59:59.999+00:00" fromWeekDay="MONDAY" toWeekDay="SUNDAY"/></qbp:rules></qbp:timetable></qbp:timetables><qbp:resources><qbp:resource id="Lane_Reception" name="📋 Специалист по приему" totalAmount="2" costPerHour="20" timetableId="QBP_DEFAULT_TIMETABLE"/><qbp:resource id="Lane_Veterinarian" name="🩺 Ветеринар" totalAmount="1" costPerHour="40" timetableId="QBP_DEFAULT_TIMETABLE"/><qbp:resource id="Lane_CareSpecialist" name="🐾 Специалист по уходу" totalAmount="3" costPerHour="18" timetableId="QBP_DEFAULT_TIMETABLE"/><qbp:resource id="Lane_Housekeeping" name="🧹 Хозяйственный отдел" totalAmount="2" costPerHour="16" timetableId="QBP_DEFAULT_TIMETABLE"/><qbp:resource id="QBP_SERVICE_RESOURCE_ID" name="Automated Service" totalAmount="1" costPerHour="0" timetableId="QBP_247_TIMETABLE"/></qbp:resources><qbp:elements><qbp:element id="qbp_3b5e007d-f231-d171-03b6-da19725377d2" elementId="Event_DepartureReminder"><qbp:durationDistribution type="FIXED" mean="432000" arg1="NaN" arg2="NaN"><qbp:timeUnit>days</qbp:timeUnit></qbp:durationDistribution></qbp:element><qbp:element id="qbp_06da7643-b68a-3c0a-c8bf-1e0e1ef66b97" elementId="Task_VetCheck"><qbp:durationDistribution type="FIXED" mean="1200" arg1="NaN" arg2="NaN"><qbp:timeUnit>minutes</qbp:timeUnit></qbp:durationDistribution><qbp:resourceIds><qbp:resourceId>Lane_Veterinarian</qbp:resourceId></qbp:resourceIds></qbp:element><qbp:element id="qbp_b81179cc-5692-3b91-73e7-8da4ee780aca" elementId="Task_Checkout"><qbp:durationDistribution type="FIXED" mean="600" arg1="NaN" arg2="NaN"><qbp:timeUnit>minutes</qbp:timeUnit></qbp:durationDistribution><qbp:resourceIds><qbp:resourceId>Lane_Reception</qbp:resourceId></qbp:resourceIds></qbp:element><qbp:element id="qbp_b92a7378-fd0a-28d0-76db-39360baa6500" elementId="SubProcess_DailyCare"><qbp:durationDistribution type="FIXED" mean="0" arg1="0" arg2="0"><qbp:timeUnit>seconds</qbp:timeUnit></qbp:durationDistribution><qbp:resourceIds><qbp:resourceId>Lane_CareSpecialist</qbp:resourceId></qbp:resourceIds></qbp:element><qbp:element id="qbp_ab36af99-2bc8-bf7d-f971-dad19c6d46bf" elementId="Task_RegisterBooking"><qbp:durationDistribution type="FIXED" mean="600" arg1="NaN" arg2="NaN"><qbp:timeUnit>minutes</qbp:timeUnit></qbp:durationDistribution><qbp:resourceIds><qbp:resourceId>Lane_Reception</qbp:resourceId></qbp:resourceIds></qbp:element><qbp:element id="qbp_b3dd38af-14d3-6904-fb05-d945db32ca55" elementId="Task_FinalReport"><qbp:durationDistribution type="FIXED" mean="300" arg1="NaN" arg2="NaN"><qbp:timeUnit>minutes</qbp:timeUnit></qbp:durationDistribution><qbp:resourceIds><qbp:resourceId>Lane_CareSpecialist</qbp:resourceId></qbp:resourceIds></qbp:element><qbp:element id="qbp_f379355f-2601-6c8e-f663-a86cdf0fb2c8" elementId="Task_SendReminder"><qbp:durationDistribution type="FIXED" mean="300" arg1="NaN" arg2="NaN"><qbp:timeUnit>minutes</qbp:timeUnit></qbp:durationDistribution><qbp:resourceIds><qbp:resourceId>QBP_SERVICE_RESOURCE_ID</qbp:resourceId></qbp:resourceIds></qbp:element><qbp:element id="qbp_b243dbba-33af-905f-a876-e989681afdc9" elementId="Task_PrepareForDeparture"><qbp:durationDistribution type="FIXED" mean="900" arg1="NaN" arg2="NaN"><qbp:timeUnit>minutes</qbp:timeUnit></qbp:durationDistribution><qbp:resourceIds><qbp:resourceId>Lane_CareSpecialist</qbp:resourceId></qbp:resourceIds></qbp:element><qbp:element id="qbp_64ebd5ad-ab99-ff7a-d66c-355d83d937e3" elementId="Task_CheckVaccination"><qbp:durationDistribution type="FIXED" mean="300" arg1="NaN" arg2="NaN"><qbp:timeUnit>minutes</qbp:timeUnit></qbp:durationDistribution><qbp:resourceIds><qbp:resourceId>Lane_Reception</qbp:resourceId></qbp:resourceIds></qbp:element><qbp:element id="qbp_6a88a349-90e3-ca3b-4bb9-58197fee06c4" elementId="Task_AssignRoom"><qbp:durationDistribution type="FIXED" mean="600" arg1="NaN" arg2="NaN"><qbp:timeUnit>minutes</qbp:timeUnit></qbp:durationDistribution><qbp:resourceIds><qbp:resourceId>Lane_CareSpecialist</qbp:resourceId></qbp:resourceIds></qbp:element><qbp:element id="qbp_db2a5ef3-2373-2736-c825-a5a16fd3ae8c" elementId="Task_CheckIn"><qbp:durationDistribution type="FIXED" mean="900" arg1="NaN" arg2="NaN"><qbp:timeUnit>minutes</qbp:timeUnit></qbp:durationDistribution><qbp:resourceIds><qbp:resourceId>Lane_Reception</qbp:resourceId></qbp:resourceIds></qbp:element><qbp:element id="qbp_a012a877-75fb-5c8f-9ea9-10ec12eecc00" elementId="Task_GenerateContract"><qbp:durationDistribution type="FIXED" mean="10" arg1="NaN" arg2="NaN"><qbp:timeUnit>seconds</qbp:timeUnit></qbp:durationDistribution><qbp:resourceIds><qbp:resourceId>QBP_SERVICE_RESOURCE_ID</qbp:resourceId></qbp:resourceIds></qbp:element><qbp:element id="qbp_557ccf86-95cc-2a23-34f0-aa8ce5b1b548" elementId="Task_Feedback"><qbp:durationDistribution type="FIXED" mean="300" arg1="NaN" arg2="NaN"><qbp:timeUnit>minutes</qbp:timeUnit></qbp:durationDistribution><qbp:resourceIds><qbp:resourceId>Lane_Reception</qbp:resourceId></qbp:resourceIds></qbp:element><qbp:element id="qbp_9031b330-5712-18eb-a21e-7ea3cce8609f" elementId="Task_CleanRoom"><qbp:durationDistribution type="FIXED" mean="1800" arg1="NaN" arg2="NaN"><qbp:timeUnit>minutes</qbp:timeUnit></qbp:durationDistribution><qbp:resourceIds><qbp:resourceId>Lane_Housekeeping</qbp:resourceId></qbp:resourceIds></qbp:element><qbp:element id="qbp_54950cbb-f866-8172-c0b1-5b6c402b697a" elementId="Task_GroupPlay"><qbp:durationDistribution type="FIXED" mean="1800" arg1="NaN" arg2="NaN"><qbp:timeUnit>minutes</qbp:timeUnit></qbp:durationDistribution><qbp:resourceIds><qbp:resourceId>Lane_CareSpecialist</qbp:resourceId></qbp:resourceIds></qbp:element><qbp:element id="qbp_1febb5a8-55d0-5d43-b36c-7007757f80fc" elementId="Task_IndividualPlay"><qbp:durationDistribution type="FIXED" mean="1200" arg1="NaN" arg2="NaN"><qbp:timeUnit>minutes</qbp:timeUnit></qbp:durationDistribution><qbp:resourceIds><qbp:resourceId>Lane_CareSpecialist</qbp:resourceId></qbp:resourceIds></qbp:element><qbp:element id="qbp_017a7aab-1fd6-1a95-dabc-2380de74f79e" elementId="Task_DailyFeeding"><qbp:durationDistribution type="FIXED" mean="1200" arg1="NaN" arg2="NaN"><qbp:timeUnit>minutes</qbp:timeUnit></qbp:durationDistribution><qbp:resourceIds><qbp:resourceId>Lane_CareSpecialist</qbp:resourceId></qbp:resourceIds></qbp:element><qbp:element id="qbp_21270bae-ca95-f3fa-909d-7c7a37b250c9" elementId="Task_OwnerUpdate"><qbp:durationDistribution type="FIXED" mean="300" arg1="NaN" arg2="NaN"><qbp:timeUnit>minutes</qbp:timeUnit></qbp:durationDistribution><qbp:resourceIds><qbp:resourceId>Lane_CareSpecialist</qbp:resourceId></qbp:resourceIds></qbp:element><qbp:element id="qbp_2ebf8c81-3fd5-658b-4e7f-560507b5e51c" elementId="Task_CompatibilityCheck"><qbp:durationDistribution type="FIXED" mean="300" arg1="NaN" arg2="NaN"><qbp:timeUnit>minutes</qbp:timeUnit></qbp:durationDistribution><qbp:resourceIds><qbp:resourceId>Lane_CareSpecialist</qbp:resourceId></qbp:resourceIds></qbp:element><qbp:element id="qbp_d518f36d-600a-bdef-d74c-ab1b514c86f2" elementId="Task_DailyWalk"><qbp:durationDistribution type="FIXED" mean="1800" arg1="NaN" arg2="NaN"><qbp:timeUnit>minutes</qbp:timeUnit></qbp:durationDistribution><qbp:resourceIds><qbp:resourceId>Lane_CareSpecialist</qbp:resourceId></qbp:resourceIds></qbp:element></qbp:elements><qbp:sequenceFlows><qbp:sequenceFlow elementId="Flow_Approved" executionProbability="0.9"/><qbp:sequenceFlow elementId="Flow_Rejected" executionProbability="0.1"/><qbp:sequenceFlow elementId="Flow_S5a" executionProbability="0.7"/><qbp:sequenceFlow elementId="Flow_S5b" executionProbability="0.3"/></qbp:sequenceFlows><qbp:statsOptions/></qbp:processSimulationInfo><qbpapi:Results xmlns:qbpapi="http://www.qbp-simulator.com/ApiSchema201212"><qbpapi:Results><qbpapi:process><qbpapi:minCycleTime>900</qbpapi:minCycleTime><qbpapi:averageCycleTime>54657.4</qbpapi:averageCycleTime><qbpapi:maxCycleTime>242710</qbpapi:maxCycleTime><qbpapi:totalCycleTime>3029110</qbpapi:totalCycleTime><qbpapi:minCost>5</qbpapi:minCost><qbpapi:averageCost>67.45333333333326</qbpapi:averageCost><qbpapi:maxCost>72.33333333333334</qbpapi:maxCost><qbpapi:totalCost>6745.333333333326</qbpapi:totalCost><qbpapi:minDuration>900</qbpapi:minDuration><qbpapi:averageDuration>6540</qbpapi:averageDuration><qbpapi:maxDuration>6900</qbpapi:maxDuration><qbpapi:processInstances>100</qbpapi:processInstances></qbpapi:process><qbpapi:elements><qbpapi:element id="PetHotelProcess.Gateway_CheckInJoin" name="GATEWAY 11 AND"><qbpapi:duration><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:duration><qbpapi:cost><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:cost><qbpapi:waitingTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:waitingTime><qbpapi:idleTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:idleTime><qbpapi:costOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:costOverThreshold><qbpapi:durationOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:durationOverThreshold><qbpapi:count>94</qbpapi:count></qbpapi:element><qbpapi:element id="PetHotelProcess.Gateway_PlayJoin" name="GATEWAY 20 XOR"><qbpapi:duration><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:duration><qbpapi:cost><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:cost><qbpapi:waitingTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:waitingTime><qbpapi:idleTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:idleTime><qbpapi:costOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:costOverThreshold><qbpapi:durationOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:durationOverThreshold><qbpapi:count>94</qbpapi:count></qbpapi:element><qbpapi:element id="PetHotelProcess.Gateway_FinalSplit" name="GATEWAY 30 AND"><qbpapi:duration><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:duration><qbpapi:cost><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:cost><qbpapi:waitingTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:waitingTime><qbpapi:idleTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:idleTime><qbpapi:costOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:costOverThreshold><qbpapi:durationOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:durationOverThreshold><qbpapi:count>94</qbpapi:count></qbpapi:element><qbpapi:element id="PetHotelProcess.Gateway_CheckInSplit" name="GATEWAY 8 AND"><qbpapi:duration><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:duration><qbpapi:cost><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:cost><qbpapi:waitingTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:waitingTime><qbpapi:idleTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:idleTime><qbpapi:costOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:costOverThreshold><qbpapi:durationOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:durationOverThreshold><qbpapi:count>94</qbpapi:count></qbpapi:element><qbpapi:element id="PetHotelProcess.Gateway_VaccinationCheck" name="Вакцинация OK?"><qbpapi:duration><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:duration><qbpapi:cost><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:cost><qbpapi:waitingTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:waitingTime><qbpapi:idleTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:idleTime><qbpapi:costOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:costOverThreshold><qbpapi:durationOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:durationOverThreshold><qbpapi:count>100</qbpapi:count></qbpapi:element><qbpapi:element id="PetHotelProcess.Task_VetCheck" name="Вет. осмотр"><qbpapi:duration><qbpapi:min>1200</qbpapi:min><qbpapi:max>1200</qbpapi:max><qbpapi:average>1200</qbpapi:average></qbpapi:duration><qbpapi:cost><qbpapi:min>13.333333333333334</qbpapi:min><qbpapi:max>13.333333333333334</qbpapi:max><qbpapi:average>13.333333333333332</qbpapi:average></qbpapi:cost><qbpapi:waitingTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:waitingTime><qbpapi:idleTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:idleTime><qbpapi:costOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:costOverThreshold><qbpapi:durationOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:durationOverThreshold><qbpapi:count>94</qbpapi:count></qbpapi:element><qbpapi:element id="PetHotelProcess.Task_Checkout" name="Выписка и расчет"><qbpapi:duration><qbpapi:min>600</qbpapi:min><qbpapi:max>600</qbpapi:max><qbpapi:average>600</qbpapi:average></qbpapi:duration><qbpapi:cost><qbpapi:min>3.3333333333333335</qbpapi:min><qbpapi:max>3.3333333333333335</qbpapi:max><qbpapi:average>3.333333333333333</qbpapi:average></qbpapi:cost><qbpapi:waitingTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:waitingTime><qbpapi:idleTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:idleTime><qbpapi:costOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:costOverThreshold><qbpapi:durationOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:durationOverThreshold><qbpapi:count>94</qbpapi:count></qbpapi:element><qbpapi:element id="PetHotelProcess.Task_GroupPlay" name="Групповые игры"><qbpapi:duration><qbpapi:min>1800</qbpapi:min><qbpapi:max>1800</qbpapi:max><qbpapi:average>1800</qbpapi:average></qbpapi:duration><qbpapi:cost><qbpapi:min>9</qbpapi:min><qbpapi:max>9</qbpapi:max><qbpapi:average>9</qbpapi:average></qbpapi:cost><qbpapi:waitingTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:waitingTime><qbpapi:idleTime><qbpapi:min>0</qbpapi:min><qbpapi:max>230400</qbpapi:max><qbpapi:average>19200</qbpapi:average></qbpapi:idleTime><qbpapi:costOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:costOverThreshold><qbpapi:durationOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:durationOverThreshold><qbpapi:count>66</qbpapi:count></qbpapi:element><qbpapi:element id="PetHotelProcess.SubProcess_DailyCare" name="Ежедневный уход"><qbpapi:duration><qbpapi:min>4800</qbpapi:min><qbpapi:max>235800</qbpapi:max><qbpapi:average>27280.85106382979</qbpapi:average></qbpapi:duration><qbpapi:cost><qbpapi:min>0</qbpapi:min><qbpapi:max>9</qbpapi:max><qbpapi:average>26.106382978723403</qbpapi:average></qbpapi:cost><qbpapi:waitingTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:waitingTime><qbpapi:idleTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:idleTime><qbpapi:costOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:costOverThreshold><qbpapi:durationOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:durationOverThreshold><qbpapi:count>94</qbpapi:count></qbpapi:element><qbpapi:element id="PetHotelProcess.Event_Start" name="Запрос получен"><qbpapi:duration><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:duration><qbpapi:cost><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:cost><qbpapi:waitingTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:waitingTime><qbpapi:idleTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:idleTime><qbpapi:costOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:costOverThreshold><qbpapi:durationOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:durationOverThreshold><qbpapi:count>100</qbpapi:count></qbpapi:element><qbpapi:element id="PetHotelProcess.Task_RegisterBooking" name="Зарегистрировать бронь"><qbpapi:duration><qbpapi:min>600</qbpapi:min><qbpapi:max>600</qbpapi:max><qbpapi:average>600</qbpapi:average></qbpapi:duration><qbpapi:cost><qbpapi:min>3.3333333333333335</qbpapi:min><qbpapi:max>3.3333333333333335</qbpapi:max><qbpapi:average>3.333333333333332</qbpapi:average></qbpapi:cost><qbpapi:waitingTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:waitingTime><qbpapi:idleTime><qbpapi:min>0</qbpapi:min><qbpapi:max>230400</qbpapi:max><qbpapi:average>22464</qbpapi:average></qbpapi:idleTime><qbpapi:costOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:costOverThreshold><qbpapi:durationOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:durationOverThreshold><qbpapi:count>100</qbpapi:count></qbpapi:element><qbpapi:element id="PetHotelProcess.Task_IndividualPlay" name="Индивидуальные игры"><qbpapi:duration><qbpapi:min>1200</qbpapi:min><qbpapi:max>1200</qbpapi:max><qbpapi:average>1200</qbpapi:average></qbpapi:duration><qbpapi:cost><qbpapi:min>6</qbpapi:min><qbpapi:max>6</qbpapi:max><qbpapi:average>6</qbpapi:average></qbpapi:cost><qbpapi:waitingTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:waitingTime><qbpapi:idleTime><qbpapi:min>0</qbpapi:min><qbpapi:max>230400</qbpapi:max><qbpapi:average>28800</qbpapi:average></qbpapi:idleTime><qbpapi:costOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:costOverThreshold><qbpapi:durationOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:durationOverThreshold><qbpapi:count>28</qbpapi:count></qbpapi:element><qbpapi:element id="PetHotelProcess.Task_FinalReport" name="Итоговый отчет"><qbpapi:duration><qbpapi:min>300</qbpapi:min><qbpapi:max>300</qbpapi:max><qbpapi:average>300</qbpapi:average></qbpapi:duration><qbpapi:cost><qbpapi:min>1.5</qbpapi:min><qbpapi:max>1.5</qbpapi:max><qbpapi:average>1.5</qbpapi:average></qbpapi:cost><qbpapi:waitingTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:waitingTime><qbpapi:idleTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:idleTime><qbpapi:costOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:costOverThreshold><qbpapi:durationOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:durationOverThreshold><qbpapi:count>94</qbpapi:count></qbpapi:element><qbpapi:element id="PetHotelProcess.Event_SubEnd" name="Конец ухода"><qbpapi:duration><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:duration><qbpapi:cost><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:cost><qbpapi:waitingTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:waitingTime><qbpapi:idleTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:idleTime><qbpapi:costOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:costOverThreshold><qbpapi:durationOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:durationOverThreshold><qbpapi:count>94</qbpapi:count></qbpapi:element><qbpapi:element id="PetHotelProcess.Task_DailyFeeding" name="Кормление"><qbpapi:duration><qbpapi:min>1200</qbpapi:min><qbpapi:max>1200</qbpapi:max><qbpapi:average>1200</qbpapi:average></qbpapi:duration><qbpapi:cost><qbpapi:min>6</qbpapi:min><qbpapi:max>6</qbpapi:max><qbpapi:average>6</qbpapi:average></qbpapi:cost><qbpapi:waitingTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:waitingTime><qbpapi:idleTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:idleTime><qbpapi:costOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:costOverThreshold><qbpapi:durationOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:durationOverThreshold><qbpapi:count>94</qbpapi:count></qbpapi:element><qbpapi:element id="PetHotelProcess.Event_SubStart" name="Начало"><qbpapi:duration><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:duration><qbpapi:cost><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:cost><qbpapi:waitingTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:waitingTime><qbpapi:idleTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:idleTime><qbpapi:costOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:costOverThreshold><qbpapi:durationOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:durationOverThreshold><qbpapi:count>94</qbpapi:count></qbpapi:element><qbpapi:element id="PetHotelProcess.Event_RoomReady" name="Номер готов"><qbpapi:duration><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:duration><qbpapi:cost><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:cost><qbpapi:waitingTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:waitingTime><qbpapi:idleTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:idleTime><qbpapi:costOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:costOverThreshold><qbpapi:durationOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:durationOverThreshold><qbpapi:count>94</qbpapi:count></qbpapi:element><qbpapi:element id="PetHotelProcess.Event_Rejected" name="Отклонено"><qbpapi:duration><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:duration><qbpapi:cost><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:cost><qbpapi:waitingTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:waitingTime><qbpapi:idleTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:idleTime><qbpapi:costOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:costOverThreshold><qbpapi:durationOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:durationOverThreshold><qbpapi:count>6</qbpapi:count></qbpapi:element><qbpapi:element id="PetHotelProcess.Task_OwnerUpdate" name="Отчет владельцу"><qbpapi:duration><qbpapi:min>300</qbpapi:min><qbpapi:max>300</qbpapi:max><qbpapi:average>300</qbpapi:average></qbpapi:duration><qbpapi:cost><qbpapi:min>1.5</qbpapi:min><qbpapi:max>1.5</qbpapi:max><qbpapi:average>1.5</qbpapi:average></qbpapi:cost><qbpapi:waitingTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:waitingTime><qbpapi:idleTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:idleTime><qbpapi:costOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:costOverThreshold><qbpapi:durationOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:durationOverThreshold><qbpapi:count>94</qbpapi:count></qbpapi:element><qbpapi:element id="PetHotelProcess.Task_CompatibilityCheck" name="Оценить совместимость"><qbpapi:duration><qbpapi:min>300</qbpapi:min><qbpapi:max>300</qbpapi:max><qbpapi:average>300</qbpapi:average></qbpapi:duration><qbpapi:cost><qbpapi:min>1.5</qbpapi:min><qbpapi:max>1.5</qbpapi:max><qbpapi:average>1.5</qbpapi:average></qbpapi:cost><qbpapi:waitingTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:waitingTime><qbpapi:idleTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:idleTime><qbpapi:costOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:costOverThreshold><qbpapi:durationOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:durationOverThreshold><qbpapi:count>94</qbpapi:count></qbpapi:element><qbpapi:element id="PetHotelProcess.Event_PetLeft" name="Питомец уехал"><qbpapi:duration><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:duration><qbpapi:cost><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:cost><qbpapi:waitingTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:waitingTime><qbpapi:idleTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:idleTime><qbpapi:costOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:costOverThreshold><qbpapi:durationOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:durationOverThreshold><qbpapi:count>94</qbpapi:count></qbpapi:element><qbpapi:element id="PetHotelProcess.Task_PrepareForDeparture" name="Подготовка к отъезду"><qbpapi:duration><qbpapi:min>900</qbpapi:min><qbpapi:max>900</qbpapi:max><qbpapi:average>900</qbpapi:average></qbpapi:duration><qbpapi:cost><qbpapi:min>4.5</qbpapi:min><qbpapi:max>4.5</qbpapi:max><qbpapi:average>4.5</qbpapi:average></qbpapi:cost><qbpapi:waitingTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:waitingTime><qbpapi:idleTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:idleTime><qbpapi:costOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:costOverThreshold><qbpapi:durationOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:durationOverThreshold><qbpapi:count>94</qbpapi:count></qbpapi:element><qbpapi:element id="PetHotelProcess.Task_CheckVaccination" name="Проверить вакцинацию"><qbpapi:duration><qbpapi:min>300</qbpapi:min><qbpapi:max>300</qbpapi:max><qbpapi:average>300</qbpapi:average></qbpapi:duration><qbpapi:cost><qbpapi:min>1.6666666666666667</qbpapi:min><qbpapi:max>1.6666666666666667</qbpapi:max><qbpapi:average>1.666666666666666</qbpapi:average></qbpapi:cost><qbpapi:waitingTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:waitingTime><qbpapi:idleTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:idleTime><qbpapi:costOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:costOverThreshold><qbpapi:durationOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:durationOverThreshold><qbpapi:count>100</qbpapi:count></qbpapi:element><qbpapi:element id="PetHotelProcess.Task_DailyWalk" name="Прогулка"><qbpapi:duration><qbpapi:min>1800</qbpapi:min><qbpapi:max>1800</qbpapi:max><qbpapi:average>1800</qbpapi:average></qbpapi:duration><qbpapi:cost><qbpapi:min>9</qbpapi:min><qbpapi:max>9</qbpapi:max><qbpapi:average>9</qbpapi:average></qbpapi:cost><qbpapi:waitingTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:waitingTime><qbpapi:idleTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:idleTime><qbpapi:costOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:costOverThreshold><qbpapi:durationOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:durationOverThreshold><qbpapi:count>94</qbpapi:count></qbpapi:element><qbpapi:element id="PetHotelProcess.Task_AssignRoom" name="Разместить в номере"><qbpapi:duration><qbpapi:min>600</qbpapi:min><qbpapi:max>600</qbpapi:max><qbpapi:average>600</qbpapi:average></qbpapi:duration><qbpapi:cost><qbpapi:min>3</qbpapi:min><qbpapi:max>3</qbpapi:max><qbpapi:average>3</qbpapi:average></qbpapi:cost><qbpapi:waitingTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:waitingTime><qbpapi:idleTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:idleTime><qbpapi:costOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:costOverThreshold><qbpapi:durationOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:durationOverThreshold><qbpapi:count>94</qbpapi:count></qbpapi:element><qbpapi:element id="PetHotelProcess.Task_CheckIn" name="Регистрация заезда"><qbpapi:duration><qbpapi:min>900</qbpapi:min><qbpapi:max>900</qbpapi:max><qbpapi:average>900</qbpapi:average></qbpapi:duration><qbpapi:cost><qbpapi:min>5</qbpapi:min><qbpapi:max>5</qbpapi:max><qbpapi:average>5</qbpapi:average></qbpapi:cost><qbpapi:waitingTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:waitingTime><qbpapi:idleTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:idleTime><qbpapi:costOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:costOverThreshold><qbpapi:durationOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:durationOverThreshold><qbpapi:count>94</qbpapi:count></qbpapi:element><qbpapi:element id="PetHotelProcess.Task_GenerateContract" name="Сгенерировать договор"><qbpapi:duration><qbpapi:min>10</qbpapi:min><qbpapi:max>10</qbpapi:max><qbpapi:average>10</qbpapi:average></qbpapi:duration><qbpapi:cost><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:cost><qbpapi:waitingTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:waitingTime><qbpapi:idleTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:idleTime><qbpapi:costOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:costOverThreshold><qbpapi:durationOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:durationOverThreshold><qbpapi:count>94</qbpapi:count></qbpapi:element><qbpapi:element id="PetHotelProcess.Task_Feedback" name="Собрать отзыв"><qbpapi:duration><qbpapi:min>300</qbpapi:min><qbpapi:max>300</qbpapi:max><qbpapi:average>300</qbpapi:average></qbpapi:duration><qbpapi:cost><qbpapi:min>1.6666666666666667</qbpapi:min><qbpapi:max>1.6666666666666667</qbpapi:max><qbpapi:average>1.6666666666666665</qbpapi:average></qbpapi:cost><qbpapi:waitingTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:waitingTime><qbpapi:idleTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:idleTime><qbpapi:costOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:costOverThreshold><qbpapi:durationOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:durationOverThreshold><qbpapi:count>94</qbpapi:count></qbpapi:element><qbpapi:element id="PetHotelProcess.Gateway_PlayDecision" name="Совместим?"><qbpapi:duration><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:duration><qbpapi:cost><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:cost><qbpapi:waitingTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:waitingTime><qbpapi:idleTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:idleTime><qbpapi:costOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:costOverThreshold><qbpapi:durationOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:durationOverThreshold><qbpapi:count>94</qbpapi:count></qbpapi:element><qbpapi:element id="PetHotelProcess.Task_CleanRoom" name="Уборка номера"><qbpapi:duration><qbpapi:min>1800</qbpapi:min><qbpapi:max>1800</qbpapi:max><qbpapi:average>1800</qbpapi:average></qbpapi:duration><qbpapi:cost><qbpapi:min>8</qbpapi:min><qbpapi:max>8</qbpapi:max><qbpapi:average>8</qbpapi:average></qbpapi:cost><qbpapi:waitingTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:waitingTime><qbpapi:idleTime><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:idleTime><qbpapi:costOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:costOverThreshold><qbpapi:durationOverThreshold><qbpapi:min>0</qbpapi:min><qbpapi:max>0</qbpapi:max><qbpapi:average>0</qbpapi:average></qbpapi:durationOverThreshold><qbpapi:count>94</qbpapi:count></qbpapi:element></qbpapi:elements><qbpapi:resources><qbpapi:resource id="QBP_SERVICE_RESOURCE_ID"><qbpapi:utilization>0.00031032217383984077</qbpapi:utilization></qbpapi:resource><qbpapi:resource id="Lane_Housekeeping"><qbpapi:utilization>0.11667195322089062</qbpapi:utilization></qbpapi:resource><qbpapi:resource id="Lane_CareSpecialist"><qbpapi:utilization>0.3034022424183917</qbpapi:utilization></qbpapi:resource><qbpapi:resource id="Lane_Veterinarian"><qbpapi:utilization>0.15556260429452082</qbpapi:utilization></qbpapi:resource><qbpapi:resource id="Lane_Reception"><qbpapi:utilization>0.17873150280647074</qbpapi:utilization></qbpapi:resource></qbpapi:resources></qbpapi:Results><qbpapi:CycleTimesData><qbpapi:min>900</qbpapi:min><qbpapi:max>242710</qbpapi:max><qbpapi:binWidth>24181</qbpapi:binWidth><qbpapi:values><qbpapi:value>52</qbpapi:value><qbpapi:value>39</qbpapi:value><qbpapi:value>9</qbpapi:value></qbpapi:values></qbpapi:CycleTimesData><qbpapi:CycleTimesInTimetableData><qbpapi:min>900</qbpapi:min><qbpapi:max>6900</qbpapi:max><qbpapi:binWidth>600</qbpapi:binWidth><qbpapi:values><qbpapi:value>6</qbpapi:value><qbpapi:value>94</qbpapi:value></qbpapi:values></qbpapi:CycleTimesInTimetableData><qbpapi:WaitingTimesData><qbpapi:min>0</qbpapi:min><qbpapi:max>5e-324</qbpapi:max><qbpapi:binWidth>1</qbpapi:binWidth><qbpapi:values><qbpapi:value>100</qbpapi:value></qbpapi:values></qbpapi:WaitingTimesData><qbpapi:CostsData><qbpapi:min>5</qbpapi:min><qbpapi:max>72.33333333333334</qbpapi:max><qbpapi:binWidth>7</qbpapi:binWidth><qbpapi:values><qbpapi:value>6</qbpapi:value><qbpapi:value>94</qbpapi:value></qbpapi:values></qbpapi:CostsData></qbpapi:Results></bpmn:definitions>

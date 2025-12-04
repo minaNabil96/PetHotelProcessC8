@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Анализ результатов симуляции гостиницы для питомцев</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* ===== RESET & BASE STYLES ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* ===== RESPONSIVE TYPOGRAPHY ===== */
+        .header h1 {
+            font-size: clamp(1.5rem, 4vw, 3rem);
+            margin-bottom: clamp(0.5rem, 2vw, 1rem);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .chart-title {
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            margin-bottom: clamp(1rem, 3vw, 1.5rem);
+            color: #333;
+            text-align: center;
+        }
+
+        /* ===== LAYOUT CONTAINERS ===== */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: clamp(10px, 3vw, 20px);
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: clamp(20px, 5vw, 30px);
+            padding: clamp(20px, 8vw, 30px) 0;
+        }
+
+        .header p {
+            font-size: clamp(0.9rem, 2.5vw, 1.2rem);
+            opacity: 0.9;
+        }
+
+        /* ===== KPI GRID ===== */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
+            gap: clamp(15px, 3vw, 20px);
+            margin-bottom: clamp(20px, 5vw, 30px);
+        }
+
+        .kpi-card {
+            background: white;
+            padding: clamp(15px, 4vw, 25px);
+            border-radius: clamp(10px, 2vw, 15px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s ease;
+            touch-action: manipulation;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .kpi-card:active {
+            transform: scale(0.98);
+        }
+
+        .kpi-value {
+            font-size: clamp(1.5rem, 5vw, 2.5rem);
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: clamp(5px, 1vw, 8px);
+        }
+
+        .kpi-label {
+            font-size: clamp(0.8rem, 2vw, 1rem);
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* ===== CHART SECTIONS ===== */
+        .chart-section {
+            background: white;
+            margin-bottom: clamp(15px, 4vw, 20px);
+            padding: clamp(20px, 6vw, 30px);
+            border-radius: clamp(10px, 2vw, 15px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+            gap: clamp(20px, 4vw, 30px);
+            margin-bottom: clamp(20px, 4vw, 30px);
+        }
+
+        .chart-container {
+            position: relative;
+            min-height: clamp(250px, 40vh, 400px);
+            width: 100%;
+        }
+
+        /* ===== TASK SECTIONS ===== */
+        .task-section {
+            background: white;
+            margin-bottom: clamp(15px, 4vw, 20px);
+            padding: clamp(20px, 6vw, 30px);
+            border-radius: clamp(10px, 2vw, 15px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .task-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+            gap: clamp(15px, 3vw, 20px);
+            margin-top: clamp(15px, 3vw, 20px);
+        }
+
+        .task-card {
+            background: #f8f9fa;
+            padding: clamp(15px, 3vw, 20px);
+            border-radius: clamp(8px, 2vw, 10px);
+            border-left: clamp(3px, 1vw, 4px) solid #667eea;
+            touch-action: manipulation;
+        }
+
+        .task-name {
+            font-weight: bold;
+            font-size: clamp(1rem, 2.5vw, 1.1rem);
+            margin-bottom: clamp(8px, 2vw, 10px);
+            color: #333;
+        }
+
+        .task-stats {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: clamp(8px, 2vw, 10px);
+        }
+
+        .task-stat {
+            font-size: clamp(0.85rem, 2vw, 0.9rem);
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            gap: 5px;
+        }
+
+        .task-stat-value {
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        /* ===== PROCESS FLOW ===== */
+        .process-flow {
+            background: white;
+            margin-bottom: clamp(15px, 4vw, 20px);
+            padding: clamp(20px, 6vw, 30px);
+            border-radius: clamp(10px, 2vw, 15px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .flow-steps {
+            display: flex;
+            flex-direction: column;
+            gap: clamp(15px, 3vw, 20px);
+            margin-top: clamp(15px, 3vw, 20px);
+        }
+
+        .flow-step {
+            background: #667eea;
+            color: white;
+            padding: clamp(15px, 4vw, 20px);
+            border-radius: clamp(8px, 2vw, 10px);
+            text-align: center;
+            position: relative;
+            transition: all 0.3s ease;
+            touch-action: manipulation;
+        }
+
+        .flow-step strong {
+            display: block;
+            font-size: clamp(1rem, 2.5vw, 1.1rem);
+            margin-bottom: clamp(5px, 1vw, 8px);
+        }
+
+        .flow-step:last-child {
+            margin-bottom: 0;
+        }
+
+        /* ===== SUMMARY SECTION ===== */
+        .summary-section {
+            background: white;
+            padding: clamp(20px, 6vw, 30px);
+            border-radius: clamp(10px, 2vw, 15px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: clamp(15px, 4vw, 20px);
+        }
+
+        .insights {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: clamp(15px, 3vw, 20px);
+            margin-top: clamp(15px, 3vw, 20px);
+        }
+
+        .insight-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: clamp(15px, 4vw, 20px);
+            border-radius: clamp(8px, 2vw, 10px);
+            touch-action: manipulation;
+        }
+
+        .insight-title {
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            font-weight: bold;
+            margin-bottom: clamp(8px, 2vw, 10px);
+        }
+
+        .insight-text {
+            font-size: clamp(0.85rem, 2vw, 0.95rem);
+            line-height: 1.5;
+        }
+
+        /* ===== RESPONSIVE BREAKPOINTS ===== */
+
+        /* Tablet Styles (768px and up) */
+        @media (min-width: 768px) {
+            .container {
+                padding: clamp(15px, 3vw, 30px);
+            }
+
+            .task-stats {
+                grid-template-columns: 1fr 1fr;
+                gap: clamp(10px, 2vw, 15px);
+            }
+
+            .flow-steps {
+                flex-direction: row;
+                align-items: stretch;
+            }
+
+            .flow-step {
+                flex: 1;
+                min-width: 120px;
+            }
+
+            .flow-step::after {
+                content: '→';
+                position: absolute;
+                right: -20px;
+                top: 50%;
+                transform: translateY(-50%);
+                font-size: clamp(1.5rem, 3vw, 2rem);
+                color: #667eea;
+                z-index: 1;
+            }
+
+            .insights {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .chart-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .chart-container {
+                min-height: clamp(300px, 45vh, 400px);
+            }
+        }
+
+        /* Desktop Styles (1024px and up) */
+        @media (min-width: 1024px) {
+            .kpi-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .task-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .insights {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .flow-step::after {
+                right: -30px;
+            }
+
+            .task-stats {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .chart-container {
+                height: 400px;
+                min-height: 400px;
+            }
+        }
+
+        /* Large Desktop (1200px and up) */
+        @media (min-width: 1200px) {
+            .task-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .chart-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Touch-Friendly Interactions */
+        @media (hover: none) {
+            .kpi-card:hover,
+            .task-card:hover,
+            .flow-step:hover,
+            .insight-card:hover {
+                transform: none;
+            }
+
+            .kpi-card:active,
+            .task-card:active,
+            .flow-step:active,
+            .insight-card:active {
+                transform: scale(0.98);
+                opacity: 0.9;
+            }
+        }
+
+        /* Very Small Screens (320px - 480px) */
+        @media (max-width: 480px) {
+            .container {
+                padding: clamp(8px, 3vw, 15px);
+            }
+
+            .kpi-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: clamp(10px, 3vw, 15px);
+            }
+
+            .kpi-card {
+                padding: clamp(12px, 4vw, 20px);
+            }
+
+            .task-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .flow-steps {
+                gap: clamp(10px, 3vw, 15px);
+            }
+
+            .flow-step {
+                padding: clamp(12px, 4vw, 18px);
+            }
+
+            .chart-container {
+                min-height: 250px;
+                height: 250px;
+            }
+
+            .chart-section,
+            .task-section,
+            .process-flow,
+            .summary-section {
+                padding: clamp(15px, 4vw, 25px);
+            }
+        }
+
+        /* Ultra-wide screens */
+        @media (min-width: 1440px) {
+            .container {
+                max-width: 1600px;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                background: white;
+                color: black;
+            }
+
+            .chart-section,
+            .task-section,
+            .process-flow,
+            .summary-section {
+                background: white;
+                box-shadow: none;
+                border: 1px solid #ddd;
+                break-inside: avoid;
+            }
+
+            .chart-container {
+                height: 300px !important;
+                min-height: 300px !important;
+            }
+        }
+
+        /* Reduce Motion for Accessibility */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* High Contrast Mode */
+        @media (prefers-contrast: high) {
+            .kpi-card,
+            .task-card,
+            .chart-section,
+            .process-flow,
+            .summary-section {
+                border: 2px solid #333;
+            }
+
+            .insight-card {
+                border: 2px solid white;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Гостиница для питомцев</h1>
+            <p>Анализ результатов симуляции - Проанализировано 100 процессов</p>
+        </div>
+
+        <!-- KPI Dashboard -->
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-value">100</div>
+                <div class="kpi-label">Проанализировано процессов</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-value">15.2h</div>
+                <div class="kpi-label">Среднее время цикла</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-value">67.45</div>
+                <div class="kpi-label">Средняя стоимость (ед.)</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-value">94%</div>
+                <div class="kpi-label">Процент завершения</div>
+            </div>
+        </div>
+
+        <!-- Resource Utilization and Cycle Time Distribution -->
+        <div class="chart-section">
+            <h2 class="chart-title">Использование ресурсов и анализ времени цикла</h2>
+            <div class="chart-grid">
+                <div class="chart-container">
+                    <canvas id="resourceChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="cycleTimeChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cost Distribution and Process Flow -->
+        <div class="chart-section">
+            <h2 class="chart-title">Распределение затрат и временная шкала процесса</h2>
+            <div class="chart-grid">
+                <div class="chart-container">
+                    <canvas id="costChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="timelineChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Process Flow Visualization -->
+        <div class="process-flow">
+            <h2 class="chart-title">Типичный поток процесса гостиницы для питомцев</h2>
+            <div class="flow-steps">
+                <div class="flow-step">
+                    <strong>Регистрация</strong>
+                    Оформление & Размещение в номере
+                </div>
+                <div class="flow-step">
+                    <strong>Вакцинация</strong>
+                    Проверка здоровья & Документооборот
+                </div>
+                <div class="flow-step">
+                    <strong>Ежедневный уход</strong>
+                    Кормление & Основные услуги
+                </div>
+                <div class="flow-step">
+                    <strong>Активности</strong>
+                    Игровое время & Прогулки
+                </div>
+                <div class="flow-step">
+                    <strong>Выписка</strong>
+                    Итоговый отчет & Расчет
+                </div>
+            </div>
+        </div>
+
+        <!-- Major Tasks Performance -->
+        <div class="task-section">
+            <h2 class="chart-title">Производительность ключевых процессов</h2>
+            <div class="task-grid">
+                <div class="task-card">
+                    <div class="task-name">Ежедневный уход</div>
+                    <div class="task-stats">
+                        <div class="task-stat">Средняя продолжительность: <span class="task-stat-value">7.6 часов</span></div>
+                        <div class="task-stat">Количество: <span class="task-stat-value">94</span></div>
+                        <div class="task-stat">Процент успеха: <span class="task-stat-value">94%</span></div>
+                        <div class="task-stat">Влияние на стоимость: <span class="task-stat-value">2.61 ед.</span></div>
+                    </div>
+                </div>
+                <div class="task-card">
+                    <div class="task-name">Групповые игры</div>
+                    <div class="task-stats">
+                        <div class="task-stat">Продолжительность: <span class="task-stat-value">30 мин</span></div>
+                        <div class="task-stat">Count: <span class="task-stat-value">66</span></div>
+                        <div class="task-stat">Использование: <span class="task-stat-value">Умеренное</span></div>
+                        <div class="task-stat">Влияние на стоимость: <span class="task-stat-value">9.0 ед.</span></div>
+                    </div>
+                </div>
+                <div class="task-card">
+                    <div class="task-name">Индивидуальные игры</div>
+                    <div class="task-stats">
+                        <div class="task-stat">Продолжительность: <span class="task-stat-value">20 мин</span></div>
+                        <div class="task-stat">Количество: <span class="task-stat-value">28</span></div>
+                        <div class="task-stat">Использование: <span class="task-stat-value">Селективное</span></div>
+                        <div class="task-stat">Влияние на стоимость: <span class="task-stat-value">6.0 ед.</span></div>
+                    </div>
+                </div>
+                <div class="task-card">
+                    <div class="task-name">Вет. осмотр</div>
+                    <div class="task-stats">
+                        <div class="task-stat">Продолжительность: <span class="task-stat-value">20 мин</span></div>
+                        <div class="task-stat">Количество: <span class="task-stat-value">94</span></div>
+                        <div class="task-stat">Процент успеха: <span class="task-stat-value">94%</span></div>
+                        <div class="task-stat">Влияние на стоимость: <span class="task-stat-value">13.33 ед.</span></div>
+                    </div>
+                </div>
+                <div class="task-card">
+                    <div class="task-name">Кормление</div>
+                    <div class="task-stats">
+                        <div class="task-stat">Продолжительность: <span class="task-stat-value">20 мин</span></div>
+                        <div class="task-stat">Количество: <span class="task-stat-value">94</span></div>
+                        <div class="task-stat">Процент успеха: <span class="task-stat-value">94%</span></div>
+                        <div class="task-stat">Влияние на стоимость: <span class="task-stat-value">6.0 ед.</span></div>
+                    </div>
+                </div>
+                <div class="task-card">
+                    <div class="task-name">Уборка номера</div>
+                    <div class="task-stats">
+                        <div class="task-stat">Продолжительность: <span class="task-stat-value">30 мин</span></div>
+                        <div class="task-stat">Количество: <span class="task-stat-value">94</span></div>
+                        <div class="task-stat">Процент успеха: <span class="task-stat-value">94%</span></div>
+                        <div class="task-stat">Влияние на стоимость: <span class="task-stat-value">8.0 ед.</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary and Insights -->
+        <div class="summary-section">
+            <h2 class="chart-title">Анализ производительности процессов</h2>
+            <div class="insights">
+                <div class="insight-card">
+                    <div class="insight-title">Пиковая загрузка</div>
+                    <div class="insight-text">
+                        Специалисты по уходу показывают наивысшее использование ресурсов на уровне 30%, что указывает на потенциальные узкие места. Рассмотрите оптимизацию штата в часы пик.
+                    </div>
+                </div>
+                <div class="insight-card">
+                    <div class="insight-title">Стоимостная эффективность</div>
+                    <div class="insight-text">
+                        94% процессов стоят 68-74 единицы, демонстрируя последовательную структуру ценообразования. Оставшиеся 6 процессов (отклоненных) стоят значительно меньше - 5-11 единиц.
+                    </div>
+                </div>
+                <div class="insight-card">
+                    <div class="insight-title">Анализ времени цикла</div>
+                    <div class="insight-text">
+                        Среднее время цикла 15.2 часа при среднем времени в рабочие часы только 1.8 часа указывает на то, что большая часть обработки происходит в нерабочее время.
+                    </div>
+                </div>
+                <div class="insight-card">
+                    <div class="insight-title">Успешность процессов</div>
+                    <div class="insight-text">
+                        94% завершенных процессов указывает на сильную операционную эффективность. 6% отказов, вероятно, связаны с несоответствием вакцинации или проблемами совместимости.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Chart.js Responsive Configuration
+        Chart.defaults.responsive = true;
+        Chart.defaults.maintainAspectRatio = false;
+        Chart.defaults.plugins.legend.display = true;
+        Chart.defaults.plugins.legend.position = 'bottom';
+        
+        // Enhanced responsive options
+        const commonResponsiveOptions = {
+            interaction: {
+                intersect: false,
+                mode: 'index'
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: window.innerWidth < 768 ? 'bottom' : 'bottom',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 20,
+                        font: {
+                            size: window.innerWidth < 768 ? 10 : 12
+                        }
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0,0,0,0.8)',
+                    titleColor: 'white',
+                    bodyColor: 'white',
+                    borderColor: '#667eea',
+                    borderWidth: 1,
+                    cornerRadius: 8,
+                    displayColors: true
+                }
+            },
+            scales: window.innerWidth < 768 ? {
+                x: {
+                    display: true,
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        maxRotation: 0,
+                        font: {
+                            size: 10
+                        }
+                    }
+                },
+                y: {
+                    display: true,
+                    grid: {
+                        color: 'rgba(0,0,0,0.1)'
+                    },
+                    ticks: {
+                        font: {
+                            size: 10
+                        }
+                    }
+                }
+            } : {
+                x: {
+                    display: true,
+                    grid: {
+                        display: false
+                    }
+                },
+                y: {
+                    display: true,
+                    grid: {
+                        color: 'rgba(0,0,0,0.1)'
+                    }
+                }
+            }
+        };
+
+        // Resource Utilization Chart
+        const resourceCtx = document.getElementById('resourceChart').getContext('2d');
+        new Chart(resourceCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Специалист по уходу', 'Специалист по приему', 'Ветеринар', 'Хозяйственный отдел'],
+                datasets: [{
+                    data: [30, 18, 16, 12],
+                    backgroundColor: [
+                        '#667eea',
+                        '#764ba2',
+                        '#f093fb',
+                        '#f5576c'
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#fff',
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                ...commonResponsiveOptions,
+                plugins: {
+                    ...commonResponsiveOptions.plugins,
+                    title: {
+                        display: true,
+                        text: 'Использование ресурсов по отделам',
+                        font: {
+                            size: window.innerWidth < 768 ? 14 : 16,
+                            weight: 'bold'
+                        },
+                        color: '#333'
+                    }
+                }
+            }
+        });
+
+        // Cycle Time Distribution Chart
+        const cycleTimeCtx = document.getElementById('cycleTimeChart').getContext('2d');
+        new Chart(cycleTimeCtx, {
+            type: 'bar',
+            data: {
+                labels: window.innerWidth < 480 ? ['900-25кс', '49-73кс', '242кс'] : 
+                        window.innerWidth < 768 ? ['900-25кс\n(52)', '49-73кс\n(39)', '242кс\n(9)'] :
+                        ['900-25,080с\n(52 процесса)', '49,262-73,442с\n(39 процессов)', '242,529-242,709с\n(9 процессов)'],
+                datasets: [{
+                    label: 'Количество процессов',
+                    data: [52, 39, 9],
+                    backgroundColor: [
+                        '#667eea',
+                        '#764ba2',
+                        '#f093fb'
+                    ],
+                    borderWidth: 0,
+                    borderRadius: 4,
+                    borderSkipped: false,
+                }]
+            },
+            options: {
+                ...commonResponsiveOptions,
+                plugins: {
+                    ...commonResponsiveOptions.plugins,
+                    title: {
+                        display: true,
+                        text: 'Распределение времени цикла процесса',
+                        font: {
+                            size: window.innerWidth < 768 ? 14 : 16,
+                            weight: 'bold'
+                        },
+                        color: '#333'
+                    },
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+
+        // Cost Distribution Chart
+        const costCtx = document.getElementById('costChart').getContext('2d');
+        new Chart(costCtx, {
+            type: 'pie',
+            data: {
+                labels: window.innerWidth < 480 ? ['Стандарт\n(68-74)', 'Сниженная\n(5-11)'] :
+                        ['Стандартная стоимость (68-74 ед.)', 'Сниженная стоимость (5-11 ед.)'],
+                datasets: [{
+                    data: [94, 6],
+                    backgroundColor: [
+                        '#667eea',
+                        '#f5576c'
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#fff',
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                ...commonResponsiveOptions,
+                plugins: {
+                    ...commonResponsiveOptions.plugins,
+                    title: {
+                        display: true,
+                        text: 'Распределение затрат на процессы',
+                        font: {
+                            size: window.innerWidth < 768 ? 14 : 16,
+                            weight: 'bold'
+                        },
+                        color: '#333'
+                    }
+                }
+            }
+        });
+
+        // Timeline Chart (In-timetable cycle time)
+        const timelineCtx = document.getElementById('timelineChart').getContext('2d');
+        new Chart(timelineCtx, {
+            type: 'bar',
+            data: {
+                labels: window.innerWidth < 480 ? ['900-1.5кс\n(6)', '6.3-6.9кс\n(94)'] :
+                        window.innerWidth < 768 ? ['900-1.5кс\n(6)', '6.3-6.9кс\n(94)'] :
+                        ['900-1,499с\n(6 процессов)', '6,300-6,899с\n(94 процесса)'],
+                datasets: [{
+                    label: 'Количество процессов',
+                    data: [6, 94],
+                    backgroundColor: [
+                        '#f5576c',
+                        '#667eea'
+                    ],
+                    borderWidth: 0,
+                    borderRadius: 4,
+                    borderSkipped: false,
+                }]
+            },
+            options: {
+                ...commonResponsiveOptions,
+                plugins: {
+                    ...commonResponsiveOptions.plugins,
+                    title: {
+                        display: true,
+                        text: 'Распределение времени цикла в рабочие часы',
+                        font: {
+                            size: window.innerWidth < 768 ? 14 : 16,
+                            weight: 'bold'
+                        },
+                        color: '#333'
+                    },
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+
+        // Window resize handler for chart updates
+        let resizeTimeout;
+        window.addEventListener('resize', function() {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(function() {
+                // Reinitialize charts with new responsive options
+                Chart.helpers.each(Chart.instances, function(instance) {
+                    instance.options.plugins.title.font.size = window.innerWidth < 768 ? 14 : 16;
+                    instance.options.plugins.legend.labels.font.size = window.innerWidth < 768 ? 10 : 12;
+                    
+                    if (instance.config.type === 'bar') {
+                        // Update bar chart labels for better mobile readability
+                        if (window.innerWidth < 480) {
+                            if (instance.canvas.id === 'cycleTimeChart') {
+                                instance.config.data.labels = ['900-25кс', '49-73кс', '242кс'];
+                            } else if (instance.canvas.id === 'timelineChart') {
+                                instance.config.data.labels = ['900-1.5кс\n(6)', '6.3-6.9кс\n(94)'];
+                            }
+                        } else if (window.innerWidth < 768) {
+                            if (instance.canvas.id === 'cycleTimeChart') {
+                                instance.config.data.labels = ['900-25кс\n(52)', '49-73кс\n(39)', '242кс\n(9)'];
+                            } else if (instance.canvas.id === 'timelineChart') {
+                                instance.config.data.labels = ['900-1.5кс\n(6)', '6.3-6.9кс\n(94)'];
+                            }
+                        } else {
+                            if (instance.canvas.id === 'cycleTimeChart') {
+                                instance.config.data.labels = ['900-25,080с\n(52 процесса)', '49,262-73,442с\n(39 процессов)', '242,529-242,709с\n(9 процессов)'];
+                            } else if (instance.canvas.id === 'timelineChart') {
+                                instance.config.data.labels = ['900-1,499с\n(6 процессов)', '6,300-6,899с\n(94 процесса)'];
+                            }
+                        }
+                    }
+                    
+                    instance.update('none');
+                });
+            }, 250);
+        });
+
+        // Touch interaction enhancements for mobile
+        if ('ontouchstart' in window) {
+            // Add touch feedback to interactive elements
+            const touchElements = document.querySelectorAll('.kpi-card, .task-card, .flow-step, .insight-card');
+            
+            touchElements.forEach(element => {
+                element.addEventListener('touchstart', function() {
+                    this.style.transform = 'scale(0.98)';
+                    this.style.opacity = '0.9';
+                });
+                
+                element.addEventListener('touchend', function() {
+                    setTimeout(() => {
+                        this.style.transform = '';
+                        this.style.opacity = '';
+                    }, 150);
+                });
+            });
+        }
+    </script>
+</body>
+</html>

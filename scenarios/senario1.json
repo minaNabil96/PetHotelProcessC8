@@ -1,0 +1,412 @@
+{
+  "total_process_instances": 1000,
+  "inter_arrival_time": {
+    "distribution_name": "fixed",
+    "distribution_params": [
+      {
+        "value": 1
+      },
+      {
+        "value": 0
+      }
+    ],
+    "time_unit": "HOURS"
+  },
+  "start_date_time": "2025-10-30T09:00:00.000+01:00",
+  "resource_profiles": [
+    {
+      "id": "Lane_Reception",
+      "name": "Специалист по приему",
+      "resource_list": [
+        {
+          "name": "Специалист по приему_1",
+          "cost_per_hour": 20,
+          "timetable_id": "default"
+        },
+        {
+          "name": "Специалист по приему_2",
+          "cost_per_hour": 20,
+          "timetable_id": "default"
+        }
+      ]
+    },
+    {
+      "id": "Lane_Veterinarian",
+      "name": "Ветеринар",
+      "resource_list": [
+        {
+          "name": "Ветеринар_1",
+          "cost_per_hour": 40,
+          "timetable_id": "default"
+        }
+      ]
+    },
+    {
+      "id": "Lane_CareSpecialist",
+      "name": "Специалист по уходу",
+      "resource_list": [
+        {
+          "name": "Специалист по уходу_1",
+          "cost_per_hour": 18,
+          "timetable_id": "24-7"
+        },
+        {
+          "name": "Специалист по уходу_2",
+          "cost_per_hour": 18,
+          "timetable_id": "24-7"
+        },
+        {
+          "name": "Специалист по уходу_3",
+          "cost_per_hour": 18,
+          "timetable_id": "24-7"
+        }
+      ]
+    },
+    {
+      "id": "Lane_Housekeeping",
+      "name": "Хозяйственный отдел",
+      "resource_list": [
+        {
+          "name": "Хозяйственный отдел_1",
+          "cost_per_hour": 16,
+          "timetable_id": "default"
+        },
+        {
+          "name": "Хозяйственный отдел_2",
+          "cost_per_hour": 16,
+          "timetable_id": "default"
+        }
+      ]
+    },
+    {
+      "id": "automated_service",
+      "name": "Automated Service",
+      "resource_list": [
+        {
+          "name": "Automated Service_1",
+          "cost_per_hour": 0,
+          "timetable_id": "24-7"
+        }
+      ]
+    }
+  ],
+  "arrival_calendar": [],
+  "task_resource_distribution": {
+    "Task_RegisterBooking": {
+      "resource_id": "Lane_Reception"
+    },
+    "Task_GenerateContract": {
+      "resource_id": "automated_service"
+    },
+    "Task_CheckIn": {
+      "resource_id": "Lane_Reception"
+    },
+    "Task_VetCheck": {
+      "resource_id": "Lane_Veterinarian"
+    },
+    "Task_AssignRoom": {
+      "resource_id": "Lane_CareSpecialist"
+    },
+    "Task_DailyFeeding": {
+      "resource_id": "Lane_CareSpecialist"
+    },
+    "Task_DailyWalk": {
+      "resource_id": "Lane_CareSpecialist"
+    },
+    "Task_GroupPlay": {
+      "resource_id": "Lane_CareSpecialist"
+    },
+    "Task_IndividualPlay": {
+      "resource_id": "Lane_CareSpecialist"
+    },
+    "Task_OwnerUpdate": {
+      "resource_id": "Lane_CareSpecialist"
+    },
+    "Task_PrepareForDeparture": {
+      "resource_id": "Lane_CareSpecialist"
+    },
+    "Task_FinalReport": {
+      "resource_id": "Lane_CareSpecialist"
+    },
+    "Task_Checkout": {
+      "resource_id": "Lane_Reception"
+    },
+    "Task_Feedback": {
+      "resource_id": "Lane_Reception"
+    },
+    "Task_CleanRoom": {
+      "resource_id": "Lane_Housekeeping"
+    },
+    "Task_SendReminder": {
+      "resource_id": "automated_service"
+    }
+  },
+  "task_duration_distribution": {
+    "Task_RegisterBooking": {
+      "distribution_name": "fixed",
+      "distribution_params": [
+        {
+          "value": 10
+        },
+        {
+          "value": 0
+        }
+      ],
+      "time_unit": "MINUTES"
+    },
+    "Task_GenerateContract": {
+      "distribution_name": "fixed",
+      "distribution_params": [
+        {
+          "value": 10
+        },
+        {
+          "value": 0
+        }
+      ],
+      "time_unit": "SECONDS"
+    },
+    "Task_CheckIn": {
+      "distribution_name": "fixed",
+      "distribution_params": [
+        {
+          "value": 15
+        },
+        {
+          "value": 0
+        }
+      ],
+      "time_unit": "MINUTES"
+    },
+    "Task_VetCheck": {
+      "distribution_name": "fixed",
+      "distribution_params": [
+        {
+          "value": 20
+        },
+        {
+          "value": 0
+        }
+      ],
+      "time_unit": "MINUTES"
+    },
+    "Task_AssignRoom": {
+      "distribution_name": "fixed",
+      "distribution_params": [
+        {
+          "value": 10
+        },
+        {
+          "value": 0
+        }
+      ],
+      "time_unit": "MINUTES"
+    },
+    "Task_DailyFeeding": {
+      "distribution_name": "fixed",
+      "distribution_params": [
+        {
+          "value": 20
+        },
+        {
+          "value": 0
+        }
+      ],
+      "time_unit": "MINUTES"
+    },
+    "Task_DailyWalk": {
+      "distribution_name": "fixed",
+      "distribution_params": [
+        {
+          "value": 30
+        },
+        {
+          "value": 0
+        }
+      ],
+      "time_unit": "MINUTES"
+    },
+    "Task_GroupPlay": {
+      "distribution_name": "fixed",
+      "distribution_params": [
+        {
+          "value": 30
+        },
+        {
+          "value": 0
+        }
+      ],
+      "time_unit": "MINUTES"
+    },
+    "Task_IndividualPlay": {
+      "distribution_name": "fixed",
+      "distribution_params": [
+        {
+          "value": 20
+        },
+        {
+          "value": 0
+        }
+      ],
+      "time_unit": "MINUTES"
+    },
+    "Task_OwnerUpdate": {
+      "distribution_name": "fixed",
+      "distribution_params": [
+        {
+          "value": 5
+        },
+        {
+          "value": 0
+        }
+      ],
+      "time_unit": "MINUTES"
+    },
+    "Task_PrepareForDeparture": {
+      "distribution_name": "fixed",
+      "distribution_params": [
+        {
+          "value": 15
+        },
+        {
+          "value": 0
+        }
+      ],
+      "time_unit": "MINUTES"
+    },
+    "Task_FinalReport": {
+      "distribution_name": "fixed",
+      "distribution_params": [
+        {
+          "value": 5
+        },
+        {
+          "value": 0
+        }
+      ],
+      "time_unit": "MINUTES"
+    },
+    "Task_Checkout": {
+      "distribution_name": "fixed",
+      "distribution_params": [
+        {
+          "value": 10
+        },
+        {
+          "value": 0
+        }
+      ],
+      "time_unit": "MINUTES"
+    },
+    "Task_Feedback": {
+      "distribution_name": "fixed",
+      "distribution_params": [
+        {
+          "value": 5
+        },
+        {
+          "value": 0
+        }
+      ],
+      "time_unit": "MINUTES"
+    },
+    "Task_CleanRoom": {
+      "distribution_name": "fixed",
+      "distribution_params": [
+        {
+          "value": 30
+        },
+        {
+          "value": 0
+        }
+      ],
+      "time_unit": "MINUTES"
+    },
+    "Task_SendReminder": {
+      "distribution_name": "fixed",
+      "distribution_params": [
+        {
+          "value": 5
+        },
+        {
+          "value": 0
+        }
+      ],
+      "time_unit": "SECONDS"
+    }
+  },
+  "gateway_branching_probabilities": {
+    "Gateway_VaccinationCheck": [
+      {
+        "path_id": "Flow_Approved",
+        "value": 0.9
+      },
+      {
+        "path_id": "Flow_Rejected",
+        "value": 0.1
+      }
+    ],
+    "Gateway_PlayDecision": [
+      {
+        "path_id": "Flow_S5a",
+        "value": 0.7
+      },
+      {
+        "path_id": "Flow_S5b",
+        "value": 0.3
+      }
+    ]
+  },
+  "event_duration_distribution": {
+    "Event_DailyTimer": {
+      "distribution_name": "fixed",
+      "distribution_params": [
+        {
+          "value": 24
+        },
+        {
+          "value": 0
+        }
+      ],
+      "time_unit": "HOURS"
+    },
+    "Event_DepartureReminder": {
+      "distribution_name": "fixed",
+      "distribution_params": [
+        {
+          "value": 1
+        },
+        {
+          "value": 0
+        }
+      ],
+      "time_unit": "SECONDS"
+    }
+  },
+  "timetables": [
+    {
+      "id": "default",
+      "name": "Default",
+      "rules": [
+        {
+          "from_day": "MONDAY",
+          "to_day": "FRIDAY",
+          "begin_time": "09:00:00",
+          "end_time": "17:00:00"
+        }
+      ]
+    },
+    {
+      "id": "24-7",
+      "name": "24/7",
+      "rules": [
+        {
+          "from_day": "MONDAY",
+          "to_day": "SUNDAY",
+          "begin_time": "00:00:00",
+          "end_time": "23:59:59"
+        }
+      ]
+    }
+  ]
+}
