@@ -39,6 +39,7 @@ services:
       - CAMUNDA_OPERATE_IDENTITY_CLIENT_SECRET=operate-secret
       - CAMUNDA_OPERATE_IDENTITY_AUDIENCE=operate
       - CAMUNDA_OPERATE_IDENTITY_REDIRECT_ROOT_URL=http://localhost:8081
+      - CAMUNDA_OPERATE_AUTHENTICATION_MODE=identity
     depends_on:
       - zeebe
       - elasticsearch
@@ -62,6 +63,7 @@ services:
       - CAMUNDA_TASKLIST_IDENTITY_CLIENT_SECRET=tasklist-secret
       - CAMUNDA_TASKLIST_IDENTITY_AUDIENCE=tasklist
       - CAMUNDA_TASKLIST_IDENTITY_REDIRECT_ROOT_URL=http://localhost:8082
+      - CAMUNDA_TASKLIST_AUTHENTICATION_MODE=identity
     volumes:
       - ./config/tasklist-application.yml:/app/resources/application.yml
     depends_on:
