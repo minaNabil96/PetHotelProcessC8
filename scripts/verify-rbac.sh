@@ -41,8 +41,8 @@ get_token() {
     echo "$response" | jq -r '.access_token'
   else
     echo "null"
-    echo "Authentication failed. Response from Keycloak:" >&2
-    echo "$response" >&2
+    # Print error for debugging (optional)
+    # echo "Error: $response" >&2
   fi
 }
 
