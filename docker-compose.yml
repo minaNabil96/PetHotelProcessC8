@@ -27,14 +27,17 @@ services:
       - CAMUNDA_OPERATE_ZEEBE_GATEWAYADDRESS=zeebe:26500
       - CAMUNDA_OPERATE_ELASTICSEARCH_URL=http://elasticsearch:9200
       - CAMUNDA_OPERATE_ZEEBEELASTICSEARCH_URL=http://elasticsearch:9200
-      # Use internal (simple) authentication - works in Codespaces
-      - SPRING_PROFILES_ACTIVE=auth
+      - CAMUNDA_OPERATE_IDENTITY_ISSUER_URL=http://keycloak:8080/realms/camunda-platform
+      - CAMUNDA_OPERATE_IDENTITY_ISSUER_BACKEND_URL=http://keycloak:8080/realms/camunda-platform
+      - CAMUNDA_OPERATE_IDENTITY_CLIENT_ID=operate
+      - CAMUNDA_OPERATE_IDENTITY_CLIENT_SECRET=operate-secret
+      - CAMUNDA_OPERATE_IDENTITY_AUDIENCE=operate
+      - CAMUNDA_OPERATE_AUTHENTICATION_MODE=identity
       - CAMUNDA_OPERATE_CSRF_PREVENTION_ENABLED=false
-    volumes:
-      - ./config/operate-users.yml:/usr/local/operate/config/application.yml
     depends_on:
       - zeebe
       - elasticsearch
+      - keycloak
     networks:
       - camunda-platform
 
@@ -47,14 +50,38 @@ services:
       - CAMUNDA_TASKLIST_ZEEBE_GATEWAYADDRESS=zeebe:26500
       - CAMUNDA_TASKLIST_ELASTICSEARCH_URL=http://elasticsearch:9200
       - CAMUNDA_TASKLIST_ZEEBEELASTICSEARCH_URL=http://elasticsearch:9200
-      # Use internal (simple) authentication - works in Codespaces
-      - SPRING_PROFILES_ACTIVE=auth
+      - CAMUNDA_TASKLIST_IDENTITY_ISSUER_URL=http://keycloak:8080/realms/camunda-platform
+      - CAMUNDA_TASKLIST_IDENTITY_ISSUER_BACKEND_URL=http://keycloak:8080/realms/camunda-platform
+      - CAMUNDA_TASKLIST_IDENTITY_CLIENT_ID=tasklist
+      - CAMUNDA_TASKLIST_IDENTITY_CLIENT_SECRET=tasklist-secret
+      - CAMUNDA_TASKLIST_IDENTITY_AUDIENCE=tasklist
+      - CAMUNDA_TASKLIST_AUTHENTICATION_MODE=identity
       - CAMUNDA_TASKLIST_CSRF_PREVENTION_ENABLED=false
-    volumes:
-      - ./config/tasklist-users.yml:/usr/local/tasklist/config/application.yml
     depends_on:
       - zeebe
       - elasticsearch
+      - keycloak
+    networks:
+      - camunda-platform
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:23.0.7
+    container_name: keycloak
+    ports:
+      - "8085:8080"
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+      # These settings allow Keycloak to work behind Codespaces proxy
+      - KC_HOSTNAME_STRICT=false
+      - KC_HOSTNAME_STRICT_HTTPS=false
+      - KC_PROXY=edge
+      - KC_HTTP_ENABLED=true
+    command: 
+      - start-dev 
+      - --import-realm
+    volumes:
+      - ./config/camunda-identity-realm.json:/opt/keycloak/data/import/realm.json
     networks:
       - camunda-platform
 
