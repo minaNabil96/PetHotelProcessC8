@@ -27,11 +27,14 @@ services:
       - CAMUNDA_OPERATE_ZEEBE_GATEWAYADDRESS=zeebe:26500
       - CAMUNDA_OPERATE_ELASTICSEARCH_URL=http://elasticsearch:9200
       - CAMUNDA_OPERATE_ZEEBEELASTICSEARCH_URL=http://elasticsearch:9200
-      - CAMUNDA_OPERATE_IDENTITY_ISSUER_URL=http://keycloak:8080/realms/camunda-platform
+      # External URL for browser redirects (set via .env file)
+      - CAMUNDA_OPERATE_IDENTITY_ISSUER_URL=${KEYCLOAK_EXTERNAL_URL:-http://localhost:8085}/realms/camunda-platform
+      # Internal URL for backend token verification
       - CAMUNDA_OPERATE_IDENTITY_ISSUER_BACKEND_URL=http://keycloak:8080/realms/camunda-platform
       - CAMUNDA_OPERATE_IDENTITY_CLIENT_ID=operate
       - CAMUNDA_OPERATE_IDENTITY_CLIENT_SECRET=operate-secret
       - CAMUNDA_OPERATE_IDENTITY_AUDIENCE=operate
+      - CAMUNDA_OPERATE_IDENTITY_REDIRECT_ROOT_URL=${OPERATE_EXTERNAL_URL:-http://localhost:8081}
       - CAMUNDA_OPERATE_AUTHENTICATION_MODE=identity
       - CAMUNDA_OPERATE_CSRF_PREVENTION_ENABLED=false
     depends_on:
@@ -50,11 +53,14 @@ services:
       - CAMUNDA_TASKLIST_ZEEBE_GATEWAYADDRESS=zeebe:26500
       - CAMUNDA_TASKLIST_ELASTICSEARCH_URL=http://elasticsearch:9200
       - CAMUNDA_TASKLIST_ZEEBEELASTICSEARCH_URL=http://elasticsearch:9200
-      - CAMUNDA_TASKLIST_IDENTITY_ISSUER_URL=http://keycloak:8080/realms/camunda-platform
+      # External URL for browser redirects (set via .env file)
+      - CAMUNDA_TASKLIST_IDENTITY_ISSUER_URL=${KEYCLOAK_EXTERNAL_URL:-http://localhost:8085}/realms/camunda-platform
+      # Internal URL for backend token verification
       - CAMUNDA_TASKLIST_IDENTITY_ISSUER_BACKEND_URL=http://keycloak:8080/realms/camunda-platform
       - CAMUNDA_TASKLIST_IDENTITY_CLIENT_ID=tasklist
       - CAMUNDA_TASKLIST_IDENTITY_CLIENT_SECRET=tasklist-secret
       - CAMUNDA_TASKLIST_IDENTITY_AUDIENCE=tasklist
+      - CAMUNDA_TASKLIST_IDENTITY_REDIRECT_ROOT_URL=${TASKLIST_EXTERNAL_URL:-http://localhost:8082}
       - CAMUNDA_TASKLIST_AUTHENTICATION_MODE=identity
       - CAMUNDA_TASKLIST_CSRF_PREVENTION_ENABLED=false
     depends_on:
@@ -72,7 +78,6 @@ services:
     environment:
       - KEYCLOAK_ADMIN=admin
       - KEYCLOAK_ADMIN_PASSWORD=admin
-      # These settings allow Keycloak to work behind Codespaces proxy
       - KC_HOSTNAME_STRICT=false
       - KC_HOSTNAME_STRICT_HTTPS=false
       - KC_PROXY=edge
