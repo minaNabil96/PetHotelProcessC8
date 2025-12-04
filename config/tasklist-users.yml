@@ -1,0 +1,27 @@
+# Tasklist User Configuration with RBAC
+# This uses Camunda's internal authentication - compatible with Codespaces
+
+camunda.tasklist:
+  # Disable CSRF for Codespaces compatibility
+  csrfPreventionEnabled: false
+  
+  # User definitions with roles
+  # Roles supported: OWNER (full access), OPERATOR (view all), USER (assigned only)
+  users:
+    # Administrator - Full access to all Tasklist operations
+    - username: admin
+      password: admin
+      roles:
+        - OWNER
+    
+    # Task Supervisor - Can view all tasks, assign/reassign
+    - username: supervisor
+      password: camunda
+      roles:
+        - OPERATOR
+    
+    # Task Executor - Can only view and complete assigned tasks
+    - username: executor
+      password: camunda
+      roles:
+        - USER

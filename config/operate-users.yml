@@ -1,0 +1,27 @@
+# Operate User Configuration with RBAC
+# This uses Camunda's internal authentication - compatible with Codespaces
+
+camunda.operate:
+  # Disable CSRF for Codespaces compatibility
+  csrfPreventionEnabled: false
+  
+  # User definitions with roles
+  # Roles supported: OWNER (full access), READER (view only)
+  users:
+    # Administrator - Full access to Operate
+    - username: admin
+      password: admin
+      roles:
+        - OWNER
+    
+    # Task Supervisor - Can view process instances
+    - username: supervisor
+      password: camunda
+      roles:
+        - OWNER
+    
+    # Task Executor - Limited access (read only)
+    - username: executor
+      password: camunda
+      roles:
+        - READER

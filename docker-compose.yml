@@ -11,18 +11,12 @@ services:
       - ZEEBE_LOG_LEVEL=debug
       - ZEEBE_BROKER_EXPORTERS_ELASTICSEARCH_CLASSNAME=io.camunda.zeebe.exporter.ElasticsearchExporter
       - ZEEBE_BROKER_EXPORTERS_ELASTICSEARCH_ARGS_URL=http://elasticsearch:9200
-      - CAMUNDA_IDENTITY_ISSUER_URL=http://keycloak:8080/auth/realms/camunda-platform
-      - CAMUNDA_IDENTITY_ISSUER_BACKEND_URL=http://keycloak:8080/auth/realms/camunda-platform
-      - CAMUNDA_IDENTITY_CLIENT_ID=zeebe
-      - CAMUNDA_IDENTITY_CLIENT_SECRET=zeebe-secret
-      - CAMUNDA_IDENTITY_AUDIENCE=zeebe
     volumes:
       - zeebe_data:/usr/local/zeebe/data
     networks:
       - camunda-platform
     depends_on:
       - elasticsearch
-      - keycloak
 
   operate:
     image: camunda/operate:8.5.0
@@ -33,18 +27,14 @@ services:
       - CAMUNDA_OPERATE_ZEEBE_GATEWAYADDRESS=zeebe:26500
       - CAMUNDA_OPERATE_ELASTICSEARCH_URL=http://elasticsearch:9200
       - CAMUNDA_OPERATE_ZEEBEELASTICSEARCH_URL=http://elasticsearch:9200
-      - CAMUNDA_OPERATE_IDENTITY_ISSUER_URL=${CAMUNDA_KEYCLOAK_URL_EXTERNAL}
-      - CAMUNDA_OPERATE_IDENTITY_ISSUER_BACKEND_URL=http://keycloak:8080/auth/realms/camunda-platform
-      - CAMUNDA_OPERATE_IDENTITY_CLIENT_ID=operate
-      - CAMUNDA_OPERATE_IDENTITY_CLIENT_SECRET=operate-secret
-      - CAMUNDA_OPERATE_IDENTITY_AUDIENCE=operate
-      - CAMUNDA_OPERATE_IDENTITY_REDIRECT_ROOT_URL=${CAMUNDA_OPERATE_URL_EXTERNAL}
-      - CAMUNDA_OPERATE_AUTHENTICATION_MODE=identity
+      # Use internal (simple) authentication - works in Codespaces
+      - SPRING_PROFILES_ACTIVE=auth
+      - CAMUNDA_OPERATE_CSRF_PREVENTION_ENABLED=false
+    volumes:
+      - ./config/operate-users.yml:/usr/local/operate/config/application.yml
     depends_on:
       - zeebe
       - elasticsearch
-      - identity
-      - keycloak
     networks:
       - camunda-platform
 
@@ -57,55 +47,14 @@ services:
       - CAMUNDA_TASKLIST_ZEEBE_GATEWAYADDRESS=zeebe:26500
       - CAMUNDA_TASKLIST_ELASTICSEARCH_URL=http://elasticsearch:9200
       - CAMUNDA_TASKLIST_ZEEBEELASTICSEARCH_URL=http://elasticsearch:9200
-      - CAMUNDA_TASKLIST_IDENTITY_ISSUER_URL=${CAMUNDA_KEYCLOAK_URL_EXTERNAL}
-      - CAMUNDA_TASKLIST_IDENTITY_ISSUER_BACKEND_URL=http://keycloak:8080/auth/realms/camunda-platform
-      - CAMUNDA_TASKLIST_IDENTITY_CLIENT_ID=tasklist
-      - CAMUNDA_TASKLIST_IDENTITY_CLIENT_SECRET=tasklist-secret
-      - CAMUNDA_TASKLIST_IDENTITY_AUDIENCE=tasklist
-      - CAMUNDA_TASKLIST_IDENTITY_REDIRECT_ROOT_URL=${CAMUNDA_TASKLIST_URL_EXTERNAL}
-      - CAMUNDA_TASKLIST_AUTHENTICATION_MODE=identity
+      # Use internal (simple) authentication - works in Codespaces
+      - SPRING_PROFILES_ACTIVE=auth
+      - CAMUNDA_TASKLIST_CSRF_PREVENTION_ENABLED=false
     volumes:
-      - ./config/tasklist-application.yml:/app/resources/application.yml
+      - ./config/tasklist-users.yml:/usr/local/tasklist/config/application.yml
     depends_on:
       - zeebe
       - elasticsearch
-      - identity
-      - keycloak
-    networks:
-      - camunda-platform
-
-  identity:
-    image: camunda/identity:8.5.0
-    container_name: identity
-    ports:
-      - "8084:8080"
-    environment:
-      - IDENTITY_KEYCLOAK_URL=http://keycloak:8080/auth
-      - IDENTITY_KEYCLOAK_URL_EXTERNAL=${CAMUNDA_KEYCLOAK_URL_EXTERNAL}
-      - IDENTITY_KEYCLOAK_REALM=camunda-platform
-      - IDENTITY_KEYCLOAK_CLIENT_ID=identity
-      - IDENTITY_KEYCLOAK_CLIENT_SECRET=identity-secret
-      - IDENTITY_RESOURCE_PERMISSIONS_ENABLED=true
-    depends_on:
-      - keycloak
-    networks:
-      - camunda-platform
-
-  keycloak:
-    image: quay.io/keycloak/keycloak:23.0.7
-    container_name: keycloak
-    ports:
-      - "8085:8080"
-    environment:
-      - KEYCLOAK_ADMIN=admin
-      - KEYCLOAK_ADMIN_PASSWORD=admin
-      - KC_PROXY=edge
-      - KC_HTTP_RELATIVE_PATH=/auth
-    command: 
-      - start-dev 
-      - --import-realm
-    volumes:
-      - ./config/camunda-identity-realm.json:/opt/keycloak/data/import/realm.json
     networks:
       - camunda-platform
 
