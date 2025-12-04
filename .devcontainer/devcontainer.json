@@ -1,21 +1,29 @@
 {
   "name": "Camunda 8 Codespace",
-  "dockerComposeFile": "../docker-compose.yml",
-  "service": "zeebe",
-  "workspaceFolder": "/workspace",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
   "forwardPorts": [
     26500,
     8081,
     8082,
-    8084,
-    8085
+    8085,
+    9200
   ],
+  "portsAttributes": {
+    "8081": {"label": "Operate"},
+    "8082": {"label": "Tasklist"},
+    "8085": {"label": "Keycloak"},
+    "26500": {"label": "Zeebe Gateway"},
+    "9200": {"label": "Elasticsearch"}
+  },
+  "postCreateCommand": "echo 'Codespace ready! Run: docker-compose up -d'",
   "customizations": {
     "vscode": {
       "extensions": [
-        "camunda.camunda-modeler-vscode-extension"
+        "ms-azuretools.vscode-docker"
       ]
     }
-  },
-  "postCreateCommand": "bash scripts/setup-identity.sh"
+  }
 }
