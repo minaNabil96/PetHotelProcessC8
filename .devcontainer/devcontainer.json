@@ -1,6 +1,7 @@
 {
   "name": "Camunda 8 Codespace",
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
   "features": {
     "ghcr.io/devcontainers/features/docker-in-docker:2": {}
   },
