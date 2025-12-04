@@ -106,9 +106,11 @@
         "*"
       ],
       "enabled": true,
-      "publicClient": true,
+      "publicClient": false,
+      "secret": "operate-secret",
       "protocol": "openid-connect",
-      "fullScopeAllowed": true
+      "fullScopeAllowed": true,
+      "directAccessGrantsEnabled": true
     },
     {
       "clientId": "tasklist",
@@ -122,9 +124,11 @@
         "*"
       ],
       "enabled": true,
-      "publicClient": true,
+      "publicClient": false,
+      "secret": "tasklist-secret",
       "protocol": "openid-connect",
-      "fullScopeAllowed": true
+      "fullScopeAllowed": true,
+      "directAccessGrantsEnabled": true
     },
     {
       "clientId": "identity",
@@ -138,9 +142,11 @@
         "*"
       ],
       "enabled": true,
-      "publicClient": true,
+      "publicClient": false,
+      "secret": "identity-secret",
       "protocol": "openid-connect",
-      "fullScopeAllowed": true
+      "fullScopeAllowed": true,
+      "directAccessGrantsEnabled": true
     },
     {
       "clientId": "zeebe",
@@ -149,7 +155,8 @@
       "publicClient": false,
       "secret": "zeebe-secret",
       "protocol": "openid-connect",
-      "serviceAccountsEnabled": true
+      "serviceAccountsEnabled": true,
+      "directAccessGrantsEnabled": true
     }
   ]
 }
