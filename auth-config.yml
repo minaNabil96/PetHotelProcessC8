@@ -1,0 +1,27 @@
+camunda:
+  operate:
+    authentication:
+      mode: simple
+      users:
+        - username: admin
+          password: admin
+          roles:
+            - OWNER
+        - username: worker1
+          password: password
+          roles:
+            - USER
+  tasklist:
+    authentication:
+      mode: simple
+      users:
+        - username: admin
+          password: admin
+          roles:
+            - OWNER
+        - username: worker1
+          password: password
+          roles:
+            - USER
+    # إيقاف CSRF ضروري لبيئة Codespaces
+    csrf-prevention-enabled: false
